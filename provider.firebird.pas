@@ -45,9 +45,16 @@ type
     function Clear: IProviderDatabase;
     function SetSQL(const ASQL: string): IProviderDatabase; overload;
     function SetSQL(const ASQL: TStrings): IProviderDatabase; overload;
+
     function SetDateTimeParam(const AName: string; const AValue: TDateTime): IProviderDatabase;
+    function SetDateParam(const AName: string; const AValue: TDate): IProviderDatabase;
+    function SetTimeParam(const AName: string; const AValue: TTime): IProviderDatabase;
+
     function SetStringParam(const AName: string; const AValue: string): IProviderDatabase;
     function SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
+    function SetFloatParam(const AName: string; const AValue: Double): IProviderDatabase;
+    function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
+
     function SetDataset(ADataSet: TFDMemTable): IProviderDatabase;
     function Open: IProviderDatabase;
     function Execute: IProviderDatabase; overload;
@@ -289,21 +296,27 @@ end;
 procedure TProviderFirebird.LoadDatabaseParams;
 var
   vServerName,
-  vPath : String;
+  vDatabaseName : String;
   vIniFile: TIniFile;
 begin
   vIniFile := TIniFile.Create(ChangeFileExt(ParamStr(0), '.conf'));
   try
-    vServerName := vIniFile.ReadString( 'BANCO', 'SERVIDOR', '127.0.0.1' );
-    vPath := vIniFile.ReadString( 'BANCO', 'PATHPAR', '');
+    vServerName := vIniFile.ReadString( 'database', 'server', '127.0.0.1' );
+    vDatabaseName := vIniFile.ReadString( 'database', 'name', '');
   finally
     vIniFile.Free;
   end;
 
-  FConnection.Params.Values['Database']:= vPath;
+  FConnection.Params.Values['Database']:= vDatabaseName;
   FConnection.Params.Values['Server']:= vServerName;
   FConnection.Params.UserName := 'sysdba';
   FConnection.Params.Password := 'masterkey';
+end;
+
+function TProviderFirebird.SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
+begin
+  Result := Self;
+  FQuery.ParamByName(AName).AsCurrency := AValue;
 end;
 
 function TProviderFirebird.SetDataset(ADataSet: TFDMemTable): IProviderDatabase;
@@ -312,10 +325,22 @@ begin
   FDataSet := ADataSet;
 end;
 
+function TProviderFirebird.SetDateParam(const AName: string; const AValue: TDate): IProviderDatabase;
+begin
+  Result := Self;
+  FQuery.ParamByName(AName).AsDate := AValue;
+end;
+
 function TProviderFirebird.SetDateTimeParam(const AName: string; const AValue: TDateTime): IProviderDatabase;
 begin
   Result := Self;
   FQuery.ParamByName(AName).AsDateTime := AValue;
+end;
+
+function TProviderFirebird.SetFloatParam(const AName: string; const AValue: Double): IProviderDatabase;
+begin
+  Result := Self;
+  FQuery.ParamByName(AName).AsFloat := AValue;
 end;
 
 function TProviderFirebird.SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
@@ -339,6 +364,12 @@ function TProviderFirebird.SetStringParam(const AName, AValue: string): IProvide
 begin
   Result := Self;
   FQuery.ParamByName(AName).AsString := AValue;
+end;
+
+function TProviderFirebird.SetTimeParam(const AName: string; const AValue: TTime): IProviderDatabase;
+begin
+  Result := Self;
+  FQuery.ParamByName(AName).AsTime := AValue;
 end;
 
 end.

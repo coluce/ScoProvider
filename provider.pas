@@ -29,8 +29,12 @@ type
     function SetSQL(const ASql: string): IProviderDatabase; overload;
     function SetSQL(const ASql: TStrings): IProviderDatabase; overload;
     function SetDateTimeParam(const AName: string; const AValue: TDateTime): IProviderDatabase;
+    function SetDateParam(const AName: string; const AValue: TDate): IProviderDatabase;
+    function SetTimeParam(const AName: string; const AValue: TTime): IProviderDatabase;
     function SetStringParam(const AName: string; const AValue: string): IProviderDatabase;
     function SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
+    function SetFloatParam(const AName: string; const AValue: Double): IProviderDatabase;
+    function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
     function SetDataset(ADataSet: TFDMemTable): IProviderDatabase;
     function Open: IProviderDatabase;
     function Execute: IProviderDatabase; overload;
