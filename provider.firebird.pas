@@ -25,11 +25,14 @@ type
     FConnection: TFDConnection;
     FQuery: TFDQuery;
     FDataSet: TFDMemTable;
+    FIniFilePath: string;
     procedure LoadDatabaseParams;
   public
 
     constructor Create;
     destructor Destroy; override;
+
+    function SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
@@ -37,6 +40,7 @@ type
     function FillPrimaryKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillForeignKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillSequences(const AList: TStrings): IProviderDatabase;
+    function FillTriggers(const ATableName: string; pList: TStrings): IProviderDatabase;
 
     function ExistsField(const ATableName, AFieldName: string): boolean;
 
@@ -89,6 +93,7 @@ end;
 
 constructor TProviderFirebird.Create;
 begin
+  FIniFilePath := ChangeFileExt(ParamStr(0), '.conf');
   FConnection := TFDConnection.Create(nil);
   FConnection.DriverName := 'FB';
   FQuery := TFDQuery.Create(FConnection);
@@ -272,6 +277,49 @@ begin
   FConnection.GetTableNames(EmptyStr, EmptyStr, EmptyStr, AList, [osMy], [tkTable]);
 end;
 
+function TProviderFirebird.FillTriggers(const ATableName: string; pList: TStrings): IProviderDatabase;
+var
+  vQuery: TFDQuery;
+begin
+
+  Result := Self;
+
+  if not Assigned(pList) then
+    Exit;
+
+  pList.Clear;
+
+  vQuery := TFDQuery.Create(FConnection);
+  try
+    vQuery.Connection := FConnection;
+    vQuery.SQL.Add('select');
+    vQuery.SQL.Add('  TRIGGERS.RDB$TRIGGER_NAME as NAME');
+    vQuery.SQL.Add('from');
+    vQuery.SQL.Add('  RDB$TRIGGERS as TRIGGERS');
+    vQuery.SQL.Add('where');
+    vQuery.SQL.Add('  TRIGGERS.RDB$RELATION_NAME = :TABLE_NAME');
+    vQuery.ParamByName('TABLE_NAME').AsString := ATableName;
+    vQuery.Open;
+
+    if not vQuery.IsEmpty then
+    begin
+      pList.BeginUpdate;
+      try
+        while not vQuery.Eof do
+        begin
+          pList.Add(vQuery.FieldByName('NAME').AsString);
+          vQuery.Next;
+        end;
+      finally
+        pList.EndUpdate;
+      end;
+    end;
+
+  finally
+    vQuery.Free;
+  end;
+end;
+
 function TProviderFirebird.Execute: IProviderDatabase;
 var
   vRowsAffected: integer;
@@ -299,7 +347,7 @@ var
   vDatabaseName : String;
   vIniFile: TIniFile;
 begin
-  vIniFile := TIniFile.Create(ChangeFileExt(ParamStr(0), '.conf'));
+  vIniFile := TIniFile.Create(FIniFilepath);
   try
     vServerName := vIniFile.ReadString( 'database', 'server', '127.0.0.1' );
     vDatabaseName := vIniFile.ReadString( 'database', 'name', '');
@@ -341,6 +389,12 @@ function TProviderFirebird.SetFloatParam(const AName: string; const AValue: Doub
 begin
   Result := Self;
   FQuery.ParamByName(AName).AsFloat := AValue;
+end;
+
+function TProviderFirebird.SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
+begin
+  Result := Self;
+  FIniFilePath := AIniFilePath;
 end;
 
 function TProviderFirebird.SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;

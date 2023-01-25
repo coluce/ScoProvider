@@ -14,12 +14,15 @@ type
   IProviderDatabase = interface
     ['{678D3DF1-4417-44EB-A88C-76D74F63B3E5}']
 
+    function SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
+
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillIndexNames(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillPrimaryKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillForeignKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillSequences(const AList: TStrings): IProviderDatabase;
+    function FillTriggers(const ATableName: string; pList: TStrings): IProviderDatabase;
 
     function ExistsField(const ATableName, AFieldName: string): boolean;
 
