@@ -22,7 +22,7 @@ type
     function FillPrimaryKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillForeignKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillSequences(const AList: TStrings): IProviderDatabase;
-    function FillTriggers(const ATableName: string; pList: TStrings): IProviderDatabase;
+    function FillTriggers(const ATableName: string; AList: TStrings): IProviderDatabase;
 
     function ExistsField(const ATableName, AFieldName: string): boolean;
 

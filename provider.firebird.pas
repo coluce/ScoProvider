@@ -40,7 +40,7 @@ type
     function FillPrimaryKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillForeignKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillSequences(const AList: TStrings): IProviderDatabase;
-    function FillTriggers(const ATableName: string; pList: TStrings): IProviderDatabase;
+    function FillTriggers(const ATableName: string; AList: TStrings): IProviderDatabase;
 
     function ExistsField(const ATableName, AFieldName: string): boolean;
 
@@ -277,7 +277,7 @@ begin
   FConnection.GetTableNames(EmptyStr, EmptyStr, EmptyStr, AList, [osMy], [tkTable]);
 end;
 
-function TProviderFirebird.FillTriggers(const ATableName: string; pList: TStrings): IProviderDatabase;
+function TProviderFirebird.FillTriggers(const ATableName: string; AList: TStrings): IProviderDatabase;
 var
   vQuery: TFDQuery;
 begin
@@ -307,7 +307,7 @@ begin
       try
         while not vQuery.Eof do
         begin
-          pList.Add(vQuery.FieldByName('NAME').AsString);
+          AList.Add(vQuery.FieldByName('NAME').AsString);
           vQuery.Next;
         end;
       finally
