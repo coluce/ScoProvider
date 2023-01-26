@@ -395,6 +395,7 @@ function TProviderFirebird.SetIniFilePath(const AIniFilePath: string): IProvider
 begin
   Result := Self;
   FIniFilePath := AIniFilePath;
+  LoadDatabaseParams;
 end;
 
 function TProviderFirebird.SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
