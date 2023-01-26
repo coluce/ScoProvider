@@ -1,7 +1,7 @@
 {
 	"name": "Provider Database",
 	"description": "Provedor de acesso ao banco de dados",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"homepage": "",
 	"mainsrc": "./",
 	"projects": [],

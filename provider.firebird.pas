@@ -284,10 +284,10 @@ begin
 
   Result := Self;
 
-  if not Assigned(pList) then
+  if not Assigned(AList) then
     Exit;
 
-  pList.Clear;
+  AList.Clear;
 
   vQuery := TFDQuery.Create(FConnection);
   try
@@ -303,7 +303,7 @@ begin
 
     if not vQuery.IsEmpty then
     begin
-      pList.BeginUpdate;
+      AList.BeginUpdate;
       try
         while not vQuery.Eof do
         begin
@@ -311,7 +311,7 @@ begin
           vQuery.Next;
         end;
       finally
-        pList.EndUpdate;
+        AList.EndUpdate;
       end;
     end;
 
