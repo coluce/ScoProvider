@@ -38,6 +38,7 @@ type
     function SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
     function SetFloatParam(const AName: string; const AValue: Double): IProviderDatabase;
     function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
+    function SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
     function SetDataset(ADataSet: TFDMemTable): IProviderDatabase;
     function Open: IProviderDatabase;
     function Execute: IProviderDatabase; overload;

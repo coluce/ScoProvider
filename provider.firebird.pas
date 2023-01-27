@@ -58,6 +58,7 @@ type
     function SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
     function SetFloatParam(const AName: string; const AValue: Double): IProviderDatabase;
     function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
+    function SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
 
     function SetDataset(ADataSet: TFDMemTable): IProviderDatabase;
     function Open: IProviderDatabase;
@@ -359,6 +360,12 @@ begin
   FConnection.Params.Values['Server']:= vServerName;
   FConnection.Params.UserName := 'sysdba';
   FConnection.Params.Password := 'masterkey';
+end;
+
+function TProviderFirebird.SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
+begin
+  Result := Self;
+  FQuery.ParamByName(AName).AsBoolean := AValue;
 end;
 
 function TProviderFirebird.SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
