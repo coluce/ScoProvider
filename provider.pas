@@ -10,7 +10,6 @@ uses
 type
 
 
-
   IProviderDatabase = interface
     ['{678D3DF1-4417-44EB-A88C-76D74F63B3E5}']
 
@@ -44,11 +43,19 @@ type
     function Execute: IProviderDatabase; overload;
     function Execute(out ARowsAffected: integer): IProviderDatabase; overload;
 
+    function StartTransaction: IProviderDatabase;
+    function InTransaction: Boolean;
+    function Commit: IProviderDatabase;
+    function Rollback: IProviderDatabase;
+
   end;
 
   TProvider = class
+  strict private
+    class var FInstance: IProviderDatabase;
   public
     class function Firebird: IProviderDatabase;
+    class function Instance: IProviderDatabase;
   end;
 
 implementation
@@ -61,6 +68,15 @@ uses
 class function TProvider.Firebird: IProviderDatabase;
 begin
   Result := TProviderFirebird.Create;
+end;
+
+class function TProvider.Instance: IProviderDatabase;
+begin
+  if not Assigned(FInstance) then
+  begin
+    FInstance := TProviderFirebird.Create;
+  end;
+  Result := FInstance;
 end;
 
 end.

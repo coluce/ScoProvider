@@ -64,6 +64,12 @@ type
     function Open: IProviderDatabase;
     function Execute: IProviderDatabase; overload;
     function Execute(out ARowsAffected: integer): IProviderDatabase; overload;
+
+    function StartTransaction: IProviderDatabase;
+    function InTransaction: Boolean;
+    function Commit: IProviderDatabase;
+    function Rollback: IProviderDatabase;
+
   end;
 
 implementation
@@ -432,6 +438,30 @@ function TProviderFirebird.SetTimeParam(const AName: string; const AValue: TTime
 begin
   Result := Self;
   FQuery.ParamByName(AName).AsTime := AValue;
+end;
+
+function TProviderFirebird.StartTransaction: IProviderDatabase;
+begin
+  Result := Self;
+  if not FConnection.InTransaction then
+    FConnection.StartTransaction;
+end;
+
+function TProviderFirebird.InTransaction: Boolean;
+begin
+  Result := False;
+end;
+
+function TProviderFirebird.Commit: IProviderDatabase;
+begin
+  if FConnection.InTransaction then
+    FConnection.Commit;
+end;
+
+function TProviderFirebird.Rollback: IProviderDatabase;
+begin
+  if FConnection.InTransaction then
+    FConnection.Rollback;
 end;
 
 end.
