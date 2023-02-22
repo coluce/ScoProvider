@@ -7,7 +7,9 @@ program ProviderExample;
 uses
   System.SysUtils,
   provider.firebird in '..\provider.firebird.pas',
-  provider in '..\provider.pas';
+  provider in '..\provider.pas',
+  structure.domain.field in '..\structure.domain.field.pas',
+  structure.domain.table in '..\structure.domain.table.pas';
 
 begin
   try

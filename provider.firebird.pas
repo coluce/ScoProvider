@@ -36,6 +36,7 @@ type
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
+    function FillFields(const ATable: ITable): IProviderDatabase;
     function FillIndexNames(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillPrimaryKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
     function FillForeignKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
@@ -152,6 +153,44 @@ begin
 
   AList.Clear;
   FConnection.GetFieldNames(EmptyStr, EmptyStr, ATableName, EmptyStr, AList);
+end;
+
+function TProviderFirebird.FillFields(const ATable: ITable): IProviderDatabase;
+var
+  vMetaInfoQuery: TFDMetaInfoQuery;
+  vField: IField;
+begin
+  if not Assigned(ATable) then
+    Exit;
+
+  ATable.Fields.Clear;
+
+  vMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
+  try
+    vMetaInfoQuery.Connection := FConnection;
+    vMetaInfoQuery.MetaInfoKind := mkTableFields;
+    vMetaInfoQuery.ObjectName := ATable.Name;
+    vMetaInfoQuery.Open;
+
+    if not vMetaInfoQuery.IsEmpty then
+    begin
+      while not vMetaInfoQuery.Eof do
+      begin
+        vField := TStructureDomain.Field
+          .ID(vMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
+          .Name(vMetaInfoQuery.FieldByName('COLUMN_NAME').AsString)
+          .FieldType(vMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString);
+
+        ATable.Fields.Add(vField.Name, vField);
+
+        vMetaInfoQuery.Next;
+      end;
+    end;
+
+  finally
+    vMetaInfoQuery.Free;
+  end;
+
 end;
 
 function TProviderFirebird.FillForeignKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
