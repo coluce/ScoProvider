@@ -190,7 +190,7 @@ begin
 
     vMetaInfoQuery.Close;
     vMetaInfoQuery.MetaInfoKind := mkPrimaryKeyFields;
-    vMetaInfoQuery.ObjectName := ATable.Name;
+    vMetaInfoQuery.BaseObjectName := ATable.Name;
     vMetaInfoQuery.Open;
 
     if not vMetaInfoQuery.IsEmpty then
