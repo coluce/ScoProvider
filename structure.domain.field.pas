@@ -32,6 +32,7 @@ type
 implementation
 
 uses
+  system.sysutils,
   system.strutils;
 
 { TField }
@@ -44,7 +45,7 @@ end;
 function TField.FieldType(const Value: string): IField;
 begin
   Result := Self;
-  FFieldType := Value;
+  FFieldType := Value.trim;
 end;
 
 function TField.ID: integer;
@@ -61,7 +62,7 @@ end;
 function TField.Name(const Value: string): IField;
 begin
   Result := Self;
-  FName := ReplaceStr(Value, '"', '');
+  FName := trim(ReplaceStr(Value, '"', ''));
 end;
 
 function TField.PrimaryKey(const Value: Boolean): IField;
