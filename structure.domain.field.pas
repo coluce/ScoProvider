@@ -15,6 +15,8 @@ type
     FFieldType: string;
   public
 
+    constructor Create;
+
     function ID: integer; overload;
     function ID(const Value: integer): IField; overload;
 
@@ -40,6 +42,14 @@ uses
 function TField.FieldType: string;
 begin
   Result := FFieldType;
+end;
+
+constructor TField.Create;
+begin
+  FID := -1;
+  FPrimaryKey := False;
+  FName := EmptyStr;
+  FFieldType := EmptyStr;
 end;
 
 function TField.FieldType(const Value: string): IField;

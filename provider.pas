@@ -16,8 +16,8 @@ type
     function ID: integer; overload;
     function ID(const Value: integer): IField; overload;
 
-//    function PrimaryKey: Boolean; overload;
-//    function PrimaryKey(const Value: Boolean): IField; overload;
+    function PrimaryKey: Boolean; overload;
+    function PrimaryKey(const Value: Boolean): IField; overload;
 
     function Name: string; overload;
     function Name(const Value: string): IField; overload;

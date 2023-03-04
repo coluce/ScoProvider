@@ -178,11 +178,29 @@ begin
       begin
         vField := TStructureDomain.Field
           .ID(vMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
+          .PrimaryKey(False)
           .Name(vMetaInfoQuery.FieldByName('COLUMN_NAME').AsString)
           .FieldType(vMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString);
 
         ATable.Fields.Add(vField.Name, vField);
 
+        vMetaInfoQuery.Next;
+      end;
+    end;
+
+    vMetaInfoQuery.Close;
+    vMetaInfoQuery.MetaInfoKind := mkPrimaryKeyFields;
+    vMetaInfoQuery.ObjectName := ATable.Name;
+    vMetaInfoQuery.Open;
+
+    if not vMetaInfoQuery.IsEmpty then
+    begin
+      while not vMetaInfoQuery.Eof do
+      begin
+        if ATable.Fields.TryGetValue(vMetaInfoQuery.FieldByName('COLUMN_NAME').AsString, vField) then
+        begin
+          vField.PrimaryKey(True);
+        end;
         vMetaInfoQuery.Next;
       end;
     end;
