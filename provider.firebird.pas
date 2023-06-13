@@ -409,20 +409,30 @@ procedure TProviderFirebird.LoadDatabaseParams;
 var
   vServerName,
   vDatabaseName : String;
+  vDataBasePath: string;
+  vUsername: string;
+  vPassword: string;
   vIniFile: TIniFile;
 begin
   vIniFile := TIniFile.Create(FIniFilepath);
   try
     vServerName := vIniFile.ReadString( 'database', 'server', '127.0.0.1' );
     vDatabaseName := vIniFile.ReadString( 'database', 'name', '');
+    vUsername := vIniFile.ReadString( 'database', 'username', 'sysdba');
+    vPassword := vIniFile.ReadString( 'database', 'password', 'masterkey');
   finally
     vIniFile.Free;
   end;
 
+  vDataBasePath := ExtractFilePath(vDatabaseName);
+  if not DirectoryExists(vDataBasePath) then
+    ForceDirectories(vDataBasePath);
+
+  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(vDatabaseName), True);
   FConnection.Params.Values['Database']:= vDatabaseName;
   FConnection.Params.Values['Server']:= vServerName;
-  FConnection.Params.UserName := 'sysdba';
-  FConnection.Params.Password := 'masterkey';
+  FConnection.Params.UserName := vUsername;
+  FConnection.Params.Password := vPassword;
 end;
 
 function TProviderFirebird.SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
