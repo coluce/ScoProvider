@@ -516,7 +516,7 @@ end;
 
 function TProviderFirebird.InTransaction: Boolean;
 begin
-  Result := False;
+  Result := FConnection.InTransaction;
 end;
 
 function TProviderFirebird.Commit: IProviderDatabase;
