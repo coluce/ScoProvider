@@ -424,6 +424,9 @@ begin
     vIniFile.Free;
   end;
 
+  if vDatabaseName.Trim.IsEmpty then
+    vDatabaseName := ChangeFileExt(ParamStr(0), '.fdb');
+
   vDataBasePath := ExtractFilePath(vDatabaseName);
   if not DirectoryExists(vDataBasePath) then
     ForceDirectories(vDataBasePath);
