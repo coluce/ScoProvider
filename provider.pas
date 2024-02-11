@@ -14,6 +14,10 @@ type
 
   end;
 
+  TProviderMemTable = class(TFDMemTable)
+
+  end;
+
   IField = interface
     ['{29D1BC0C-62BA-4016-A621-6219141961FA}']
 
