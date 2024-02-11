@@ -130,14 +130,14 @@ end;
 
 function TProviderFirebird.ExistsField(const ATableName, AFieldName: string): boolean;
 var
-  vList: TStrings;
+  LList: TStrings;
 begin
-  vList := TStringList.Create;
+  LList := TStringList.Create;
   try
-    FConnection.GetFieldNames(EmptyStr, EmptyStr, ATableName, EmptyStr, vList);
-    Result := vList.IndexOf(UpperCase(AFieldName)) <> -1;
+    FConnection.GetFieldNames(EmptyStr, EmptyStr, ATableName, EmptyStr, LList);
+    Result := LList.IndexOf(UpperCase(AFieldName)) <> -1;
   finally
-    vList.Free;
+    LList.Free;
   end;
 end;
 
@@ -157,63 +157,63 @@ end;
 
 function TProviderFirebird.FillFields(const ATable: ITable): IProviderDatabase;
 var
-  vMetaInfoQuery: TFDMetaInfoQuery;
-  vField: IField;
+  LMetaInfoQuery: TFDMetaInfoQuery;
+  LField: IField;
 begin
   if not Assigned(ATable) then
     Exit;
 
   ATable.Fields.Clear;
 
-  vMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
+  LMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
   try
-    vMetaInfoQuery.Connection := FConnection;
-    vMetaInfoQuery.MetaInfoKind := mkTableFields;
-    vMetaInfoQuery.ObjectName := ATable.Name;
-    vMetaInfoQuery.Open;
+    LMetaInfoQuery.Connection := FConnection;
+    LMetaInfoQuery.MetaInfoKind := mkTableFields;
+    LMetaInfoQuery.ObjectName := ATable.Name;
+    LMetaInfoQuery.Open;
 
-    if not vMetaInfoQuery.IsEmpty then
+    if not LMetaInfoQuery.IsEmpty then
     begin
-      while not vMetaInfoQuery.Eof do
+      while not LMetaInfoQuery.Eof do
       begin
-        vField := TStructureDomain.Field
-          .ID(vMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
+        LField := TStructureDomain.Field
+          .ID(LMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
           .PrimaryKey(False)
-          .Name(vMetaInfoQuery.FieldByName('COLUMN_NAME').AsString)
-          .FieldType(vMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString);
+          .Name(LMetaInfoQuery.FieldByName('COLUMN_NAME').AsString)
+          .FieldType(LMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString);
 
-        ATable.Fields.Add(vField.Name, vField);
+        ATable.Fields.Add(LField.Name, LField);
 
-        vMetaInfoQuery.Next;
+        LMetaInfoQuery.Next;
       end;
     end;
 
-    vMetaInfoQuery.Close;
-    vMetaInfoQuery.MetaInfoKind := mkPrimaryKeyFields;
-    vMetaInfoQuery.BaseObjectName := ATable.Name;
-    vMetaInfoQuery.Open;
+    LMetaInfoQuery.Close;
+    LMetaInfoQuery.MetaInfoKind := mkPrimaryKeyFields;
+    LMetaInfoQuery.BaseObjectName := ATable.Name;
+    LMetaInfoQuery.Open;
 
-    if not vMetaInfoQuery.IsEmpty then
+    if not LMetaInfoQuery.IsEmpty then
     begin
-      while not vMetaInfoQuery.Eof do
+      while not LMetaInfoQuery.Eof do
       begin
-        if ATable.Fields.TryGetValue(vMetaInfoQuery.FieldByName('COLUMN_NAME').AsString, vField) then
+        if ATable.Fields.TryGetValue(LMetaInfoQuery.FieldByName('COLUMN_NAME').AsString, LField) then
         begin
-          vField.PrimaryKey(True);
+          LField.PrimaryKey(True);
         end;
-        vMetaInfoQuery.Next;
+        LMetaInfoQuery.Next;
       end;
     end;
 
   finally
-    vMetaInfoQuery.Free;
+    LMetaInfoQuery.Free;
   end;
 
 end;
 
 function TProviderFirebird.FillForeignKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
 var
-  vMetaInfoQuery: TFDMetaInfoQuery;
+  LMetaInfoQuery: TFDMetaInfoQuery;
 begin
 
   Result := Self;
@@ -223,21 +223,21 @@ begin
 
   AList.Clear;
 
-  vMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
+  LMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
   try
-    vMetaInfoQuery.Connection := FConnection;
-    vMetaInfoQuery.MetaInfoKind := mkForeignKeys;
-    vMetaInfoQuery.ObjectName := ATableName;
-    vMetaInfoQuery.Open;
+    LMetaInfoQuery.Connection := FConnection;
+    LMetaInfoQuery.MetaInfoKind := mkForeignKeys;
+    LMetaInfoQuery.ObjectName := ATableName;
+    LMetaInfoQuery.Open;
 
-    if not vMetaInfoQuery.IsEmpty then
+    if not LMetaInfoQuery.IsEmpty then
     begin
       AList.BeginUpdate;
       try
-        while not vMetaInfoQuery.Eof do
+        while not LMetaInfoQuery.Eof do
         begin
-          AList.Add(vMetaInfoQuery.FieldByName('FKEY_NAME').AsString);
-          vMetaInfoQuery.Next;
+          AList.Add(LMetaInfoQuery.FieldByName('FKEY_NAME').AsString);
+          LMetaInfoQuery.Next;
         end;
       finally
         AList.EndUpdate;
@@ -245,7 +245,7 @@ begin
     end;
 
   finally
-    vMetaInfoQuery.Free;
+    LMetaInfoQuery.Free;
   end;
 end;
 
@@ -261,7 +261,7 @@ end;
 
 function TProviderFirebird.FillPrimaryKeys(const ATableName: string; AList: TStrings): IProviderDatabase;
 var
-  vMetaInfoQuery: TFDMetaInfoQuery;
+  LMetaInfoQuery: TFDMetaInfoQuery;
 begin
   Result := Self;
 
@@ -269,21 +269,21 @@ begin
     Exit;
 
   AList.Clear;
-  vMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
+  LMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
   try
-    vMetaInfoQuery.Connection := FConnection;
-    vMetaInfoQuery.MetaInfoKind := mkPrimaryKey;
-    vMetaInfoQuery.ObjectName := ATableName;
-    vMetaInfoQuery.Open;
+    LMetaInfoQuery.Connection := FConnection;
+    LMetaInfoQuery.MetaInfoKind := mkPrimaryKey;
+    LMetaInfoQuery.ObjectName := ATableName;
+    LMetaInfoQuery.Open;
 
-    if not vMetaInfoQuery.IsEmpty then
+    if not LMetaInfoQuery.IsEmpty then
     begin
       AList.BeginUpdate;
       try
-        while not vMetaInfoQuery.Eof do
+        while not LMetaInfoQuery.Eof do
         begin
-          AList.Add(vMetaInfoQuery.FieldByName('CONSTRAINT_NAME').AsString);
-          vMetaInfoQuery.Next;
+          AList.Add(LMetaInfoQuery.FieldByName('CONSTRAINT_NAME').AsString);
+          LMetaInfoQuery.Next;
         end;
       finally
         AList.EndUpdate;
@@ -291,13 +291,13 @@ begin
     end;
 
   finally
-    vMetaInfoQuery.Free;
+    LMetaInfoQuery.Free;
   end;
 end;
 
 function TProviderFirebird.FillSequences(const AList: TStrings): IProviderDatabase;
 var
-  vMetaInfoQuery: TFDMetaInfoQuery;
+  LMetaInfoQuery: TFDMetaInfoQuery;
 begin
 
   Result := Self;
@@ -307,20 +307,20 @@ begin
 
   AList.Clear;
 
-  vMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
+  LMetaInfoQuery := TFDMetaInfoQuery.Create(FConnection);
   try
-    vMetaInfoQuery.Connection := FConnection;
-    vMetaInfoQuery.MetaInfoKind := mkGenerators;
-    vMetaInfoQuery.Open;
+    LMetaInfoQuery.Connection := FConnection;
+    LMetaInfoQuery.MetaInfoKind := mkGenerators;
+    LMetaInfoQuery.Open;
 
-    if not vMetaInfoQuery.IsEmpty then
+    if not LMetaInfoQuery.IsEmpty then
     begin
       AList.BeginUpdate;
       try
-        while not vMetaInfoQuery.Eof do
+        while not LMetaInfoQuery.Eof do
         begin
-          AList.Add(vMetaInfoQuery.FieldByName('GENERATOR_NAME').AsString);
-          vMetaInfoQuery.Next;
+          AList.Add(LMetaInfoQuery.FieldByName('GENERATOR_NAME').AsString);
+          LMetaInfoQuery.Next;
         end;
       finally
         AList.EndUpdate;
@@ -328,7 +328,7 @@ begin
     end;
 
   finally
-    vMetaInfoQuery.Free;
+    LMetaInfoQuery.Free;
   end;
 end;
 
@@ -343,7 +343,7 @@ end;
 
 function TProviderFirebird.FillTriggers(const ATableName: string; AList: TStrings): IProviderDatabase;
 var
-  vQuery: TFDQuery;
+  LQuery: TFDQuery;
 begin
 
   Result := Self;
@@ -353,26 +353,26 @@ begin
 
   AList.Clear;
 
-  vQuery := TFDQuery.Create(FConnection);
+  LQuery := TFDQuery.Create(FConnection);
   try
-    vQuery.Connection := FConnection;
-    vQuery.SQL.Add('select');
-    vQuery.SQL.Add('  TRIGGERS.RDB$TRIGGER_NAME as NAME');
-    vQuery.SQL.Add('from');
-    vQuery.SQL.Add('  RDB$TRIGGERS as TRIGGERS');
-    vQuery.SQL.Add('where');
-    vQuery.SQL.Add('  TRIGGERS.RDB$RELATION_NAME = :TABLE_NAME');
-    vQuery.ParamByName('TABLE_NAME').AsString := ATableName;
-    vQuery.Open;
+    LQuery.Connection := FConnection;
+    LQuery.SQL.Add('select');
+    LQuery.SQL.Add('  TRIGGERS.RDB$TRIGGER_NAME as NAME');
+    LQuery.SQL.Add('from');
+    LQuery.SQL.Add('  RDB$TRIGGERS as TRIGGERS');
+    LQuery.SQL.Add('where');
+    LQuery.SQL.Add('  TRIGGERS.RDB$RELATION_NAME = :TABLE_NAME');
+    LQuery.ParamByName('TABLE_NAME').AsString := ATableName;
+    LQuery.Open;
 
-    if not vQuery.IsEmpty then
+    if not LQuery.IsEmpty then
     begin
       AList.BeginUpdate;
       try
-        while not vQuery.Eof do
+        while not LQuery.Eof do
         begin
-          AList.Add(vQuery.FieldByName('NAME').AsString);
-          vQuery.Next;
+          AList.Add(LQuery.FieldByName('NAME').AsString);
+          LQuery.Next;
         end;
       finally
         AList.EndUpdate;
@@ -380,15 +380,15 @@ begin
     end;
 
   finally
-    vQuery.Free;
+    LQuery.Free;
   end;
 end;
 
 function TProviderFirebird.Execute: IProviderDatabase;
 var
-  vRowsAffected: integer;
+  LRowsAffected: integer;
 begin
-  Result := Execute(vRowsAffected);
+  Result := Execute(LRowsAffected);
 end;
 
 function TProviderFirebird.Open: IProviderDatabase;
@@ -407,35 +407,35 @@ end;
 
 procedure TProviderFirebird.LoadDatabaseParams;
 var
-  vServerName,
-  vDatabaseName : String;
-  vDataBasePath: string;
-  vUsername: string;
-  vPassword: string;
-  vIniFile: TIniFile;
+  LServerName,
+  LDatabaseName : String;
+  LDataBasePath: string;
+  LUsername: string;
+  LPassword: string;
+  LIniFile: TIniFile;
 begin
-  vIniFile := TIniFile.Create(FIniFilepath);
+  LIniFile := TIniFile.Create(FIniFilepath);
   try
-    vServerName := vIniFile.ReadString( 'database', 'server', '127.0.0.1' );
-    vDatabaseName := vIniFile.ReadString( 'database', 'name', '');
-    vUsername := vIniFile.ReadString( 'database', 'username', 'sysdba');
-    vPassword := vIniFile.ReadString( 'database', 'password', 'masterkey');
+    LServerName := LIniFile.ReadString( 'database', 'server', '127.0.0.1' );
+    LDatabaseName := LIniFile.ReadString( 'database', 'name', '');
+    LUsername := LIniFile.ReadString( 'database', 'username', 'sysdba');
+    LPassword := LIniFile.ReadString( 'database', 'password', 'masterkey');
   finally
-    vIniFile.Free;
+    LIniFile.Free;
   end;
 
-  if vDatabaseName.Trim.IsEmpty then
-    vDatabaseName := ChangeFileExt(ParamStr(0), '.fdb');
+  if LDatabaseName.Trim.IsEmpty then
+    LDatabaseName := ChangeFileExt(ParamStr(0), '.fdb');
 
-  vDataBasePath := ExtractFilePath(vDatabaseName);
-  if not DirectoryExists(vDataBasePath) then
-    ForceDirectories(vDataBasePath);
+  LDataBasePath := ExtractFilePath(LDatabaseName);
+  if not DirectoryExists(LDataBasePath) then
+    ForceDirectories(LDataBasePath);
 
-  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(vDatabaseName), True);
-  FConnection.Params.Values['Database']:= vDatabaseName;
-  FConnection.Params.Values['Server']:= vServerName;
-  FConnection.Params.UserName := vUsername;
-  FConnection.Params.Password := vPassword;
+  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(LDatabaseName), True);
+  FConnection.Params.Values['Database']:= LDatabaseName;
+  FConnection.Params.Values['Server']:= LServerName;
+  FConnection.Params.UserName := LUsername;
+  FConnection.Params.Password := LPassword;
 end;
 
 function TProviderFirebird.SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
