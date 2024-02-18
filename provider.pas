@@ -38,6 +38,9 @@ type
   ITable = interface
     ['{AEF9F64E-33D2-4433-A999-C3A8C8EF3F03}']
 
+    function ID: string; overload;
+    function ID(const Value: string): ITable; overload;
+
     function Name: string; overload;
     function Name(const Value: string): ITable; overload;
 
