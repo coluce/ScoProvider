@@ -13,6 +13,8 @@ type
     FPrimaryKey: Boolean;
     FName: string;
     FFieldType: string;
+    FFieldSize: integer;
+    FObs: string;
   public
 
     constructor Create;
@@ -28,6 +30,12 @@ type
 
     function FieldType: string; overload;
     function FieldType(const Value: string): IField; overload;
+
+    function FieldSize: integer; overload;
+    function FieldSize(const Value: integer): IField; overload;
+
+    function Obs: string; overload;
+    function Obs(const Value: string): IField; overload;
 
   end;
 
@@ -50,6 +58,19 @@ begin
   FPrimaryKey := False;
   FName := EmptyStr;
   FFieldType := EmptyStr;
+  FFieldSize := -1;
+  FObs := EmptyStr;
+end;
+
+function TField.FieldSize(const Value: integer): IField;
+begin
+  Result := Self;
+  FFieldSize := Value;
+end;
+
+function TField.FieldSize: integer;
+begin
+  Result := FFieldSize;
 end;
 
 function TField.FieldType(const Value: string): IField;
@@ -73,6 +94,17 @@ function TField.Name(const Value: string): IField;
 begin
   Result := Self;
   FName := trim(ReplaceStr(Value, '"', ''));
+end;
+
+function TField.Obs(const Value: string): IField;
+begin
+  Result := Self;
+  FObs := Value;
+end;
+
+function TField.Obs: string;
+begin
+  Result := FObs;
 end;
 
 function TField.PrimaryKey(const Value: Boolean): IField;

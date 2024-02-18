@@ -13,6 +13,7 @@ type
     FID: string;
     FName: string;
     FFields: TDictionary<string, IField>;
+    FObs: string;
   public
 
     constructor Create;
@@ -25,6 +26,9 @@ type
     function Name(const Value: string): ITable; overload;
 
     function Fields: TDictionary<string, IField>;
+
+    function Obs: string; overload;
+    function Obs(const Value: string): ITable; overload;
 
   end;
 
@@ -39,6 +43,7 @@ constructor TTable.Create;
 begin
   FID := TGUID.NewGuid.ToString;
   FFields := TDictionary<string, IField>.Create;
+  FObs := EmptyStr;
 end;
 
 destructor TTable.Destroy;
@@ -67,6 +72,17 @@ function TTable.Name(const Value: string): ITable;
 begin
   Result := Self;
   FName := ReplaceStr(Value, '"', '');
+end;
+
+function TTable.Obs(const Value: string): ITable;
+begin
+  Result := Self;
+  FObs := Value;
+end;
+
+function TTable.Obs: string;
+begin
+  Result := FObs;
 end;
 
 function TTable.Name: string;

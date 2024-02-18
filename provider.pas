@@ -33,6 +33,12 @@ type
     function FieldType: string; overload;
     function FieldType(const Value: string): IField; overload;
 
+    function FieldSize: integer; overload;
+    function FieldSize(const Value: integer): IField; overload;
+
+    function Obs: string; overload;
+    function Obs(const Value: string): IField; overload;
+
   end;
 
   ITable = interface
@@ -45,6 +51,9 @@ type
     function Name(const Value: string): ITable; overload;
 
     function Fields: TDictionary<string, IField>;
+
+    function Obs: string; overload;
+    function Obs(const Value: string): ITable; overload;
 
   end;
 
