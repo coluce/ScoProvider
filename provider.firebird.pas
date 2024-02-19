@@ -180,7 +180,8 @@ begin
           .ID(LMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
           .PrimaryKey(False)
           .Name(LMetaInfoQuery.FieldByName('COLUMN_NAME').AsString)
-          .FieldType(LMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString);
+          .FieldType(LMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString)
+          .FieldSize(LMetaInfoQuery.FieldByName('COLUMN_LENGTH').AsInteger);
 
         ATable.Fields.Add(LField.Name, LField);
 
