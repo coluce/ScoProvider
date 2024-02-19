@@ -23,6 +23,7 @@ type
   TProviderFirebird = class(TInterfacedObject, IProviderDatabase)
   private
     FConnection: TFDConnection;
+    FConnectionInfo: TDatabaseInfo;
     FQuery: TFDQuery;
     FDataSet: TFDMemTable;
     FIniFilePath: string;
@@ -33,6 +34,7 @@ type
     destructor Destroy; override;
 
     function SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
+    function SetDatabaseInfo(AInfo: TDatabaseInfo): IProviderDatabase;
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
@@ -408,35 +410,38 @@ end;
 
 procedure TProviderFirebird.LoadDatabaseParams;
 var
-  LServerName,
-  LDatabaseName : String;
   LDataBasePath: string;
-  LUsername: string;
-  LPassword: string;
   LIniFile: TIniFile;
 begin
-  LIniFile := TIniFile.Create(FIniFilepath);
-  try
-    LServerName := LIniFile.ReadString( 'database', 'server', '127.0.0.1' );
-    LDatabaseName := LIniFile.ReadString( 'database', 'name', '');
-    LUsername := LIniFile.ReadString( 'database', 'username', 'sysdba');
-    LPassword := LIniFile.ReadString( 'database', 'password', 'masterkey');
-  finally
-    LIniFile.Free;
+
+  if not FIniFilePath.Trim.IsEmpty then
+  begin
+    LIniFile := TIniFile.Create(FIniFilepath);
+    try
+      FConnectionInfo.Server := LIniFile.ReadString( 'database', 'server', '127.0.0.1' );
+      FConnectionInfo.FileName := LIniFile.ReadString( 'database', 'name', '');
+      FConnectionInfo.UserName := LIniFile.ReadString( 'database', 'username', 'sysdba');
+      FConnectionInfo.Password := LIniFile.ReadString( 'database', 'password', 'masterkey');
+    finally
+      LIniFile.Free;
+    end;
   end;
 
-  if LDatabaseName.Trim.IsEmpty then
-    LDatabaseName := ChangeFileExt(ParamStr(0), '.fdb');
+  if FConnectionInfo.FileName.Trim.IsEmpty then
+    FConnectionInfo.FileName := ChangeFileExt(ParamStr(0), '.fdb');
 
-  LDataBasePath := ExtractFilePath(LDatabaseName);
+  LDataBasePath := ExtractFilePath(FConnectionInfo.FileName);
   if not DirectoryExists(LDataBasePath) then
     ForceDirectories(LDataBasePath);
 
-  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(LDatabaseName), True);
-  FConnection.Params.Values['Database']:= LDatabaseName;
-  FConnection.Params.Values['Server']:= LServerName;
-  FConnection.Params.UserName := LUsername;
-  FConnection.Params.Password := LPassword;
+  if FConnection.Connected then
+    FConnection.Close;
+
+  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(FConnectionInfo.FileName), True);
+  FConnection.Params.Values['Database']:= FConnectionInfo.FileName;
+  FConnection.Params.Values['Server']:= FConnectionInfo.Server;
+  FConnection.Params.UserName := FConnectionInfo.UserName;
+  FConnection.Params.Password := FConnectionInfo.Password;
 end;
 
 function TProviderFirebird.SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
@@ -449,6 +454,14 @@ function TProviderFirebird.SetCurrencyParam(const AName: string; const AValue: C
 begin
   Result := Self;
   FQuery.ParamByName(AName).AsCurrency := AValue;
+end;
+
+function TProviderFirebird.SetDatabaseInfo(AInfo: TDatabaseInfo): IProviderDatabase;
+begin
+  Result := Self;
+  FConnectionInfo := AInfo;
+  FIniFilePath := '';
+  LoadDatabaseParams;
 end;
 
 function TProviderFirebird.SetDataset(ADataSet: TFDMemTable): IProviderDatabase;

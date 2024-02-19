@@ -57,10 +57,18 @@ type
 
   end;
 
+  TDatabaseInfo = record
+    Server: string;
+    FileName: string;
+    UserName: string;
+    Password: string;
+  end;
+
   IProviderDatabase = interface
     ['{678D3DF1-4417-44EB-A88C-76D74F63B3E5}']
 
     function SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
+    function SetDatabaseInfo(AInfo: TDatabaseInfo): IProviderDatabase;
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
