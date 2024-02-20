@@ -11,11 +11,12 @@ uses
 type
 
   TProviderQuery = class(TFDQuery)
+  end;
 
+  TProviderTable = class(TFDTable)
   end;
 
   TProviderMemTable = class(TFDMemTable)
-
   end;
 
   IField = interface
