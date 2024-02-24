@@ -6,6 +6,7 @@ program ProviderExample;
 
 uses
   System.SysUtils,
+  Data.DB,
   provider.firebird in '..\provider.firebird.pas',
   provider in '..\provider.pas',
   structure.domain.field in '..\structure.domain.field.pas',
@@ -18,6 +19,7 @@ var
   i: integer;
   LStrLine: string;
 begin
+  Writeln('Provider - Projeto de Exemplo');
   try
 
     LDatabaseInfo.Server := 'localhost';
@@ -25,6 +27,11 @@ begin
     LDatabaseInfo.FileName := 'deathstar.fdb';
     LDatabaseInfo.UserName := 'SYSDBA';
     LDatabaseInfo.Password := '1709d7c5c7eb4f910115';
+
+    Writeln('');
+    Writeln('Database: ' + LDatabaseInfo.FileName);
+    Writeln('aguarde ... lendo registros');
+    Writeln('');
 
     LDataSet := TProviderMemTable.Create(nil);
     try
@@ -38,19 +45,13 @@ begin
 
       if not LDataSet.IsEmpty then
       begin
-
-        for i := 0 to LDataSet.Fields.Count -1 do
-        begin
-          Write(LDataSet.Fields[i].FieldName + ' |');
-        end;
-
         LDataSet.First;
         while not LDataSet.Eof do
         begin
           LStrLine := EmptyStr;
           for i := 0 to LDataSet.Fields.Count -1 do
           begin
-            LStrLine := LStrLine + LDataSet.Fields[i].AsString + ' |';
+            LStrLine := LStrLine + LDataSet.Fields[i].AsString + ' - ';
           end;
           Writeln(LStrLine);
           LDataSet.Next;

@@ -410,7 +410,7 @@ end;
 
 procedure TProviderFirebird.LoadDatabaseParams;
 var
-  LDataBasePath: string;
+//  LDataBasePath: string;
   LIniFile: TIniFile;
 begin
 
