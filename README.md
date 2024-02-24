@@ -4,7 +4,7 @@ Installation is done using the [`boss install`](https://github.com/HashLoad/boss
 boss install github.com/coluce/provider
 ```
 
-## ⚡️ Quickstart Delphi
+## ⚡️ Quickstart
 ```delphi
 uses 
   provider;
