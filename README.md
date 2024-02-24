@@ -16,7 +16,7 @@ var
   i: integer;  
 begin
   LDatabaseInfo.Server := 'localhost';
-  LDatabaseInfo.Port := 305o;
+  LDatabaseInfo.Port := 3050;
   LDatabaseInfo.FileName := 'my_firebird_database.fdb';
   LDatabaseInfo.UserName := 'SYSDBA';
   LDatabaseInfo.Password := 'my_secret_password';
