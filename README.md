@@ -23,13 +23,13 @@ begin
   LDatabaseInfo.Password := 'my_secret_password';
 
   LProvider := TProvider.Instance
-   .SetDatabaseInfo(LDatabaseInfo);
+    .SetDatabaseInfo(LDatabaseInfo);
 
   LProvider	
-  .Clear
-  .SetSQL('select * from MY_TABLE')
-  .SetDataset(LDataSet)
-  .Open;
+    .Clear
+    .SetSQL('select * from MY_TABLE')
+    .SetDataset(LDataSet)
+    .Open;
 
   LDataSet.First;
   while not LDataSet.Eof do
