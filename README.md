@@ -22,13 +22,13 @@ begin
   LDatabaseInfo.Password := 'my_secret_password';
 
   LProvider := TProvider.Instance
-	.SetDatabaseInfo(LDatabaseInfo);
-	
+   .SetDatabaseInfo(LDatabaseInfo);
+
   LProvider	
-	.Clear
-	.SetSQL('select * from MY_TABLE')
-	.SetDataset(LDataSet)
-	.Open;
+  .Clear
+  .SetSQL('select * from MY_TABLE')
+  .SetDataset(LDataSet)
+  .Open;
 
   LDataSet.First;
   while not LDataSet.Eof do
@@ -36,11 +36,11 @@ begin
     LStrLine := EmptyStr;
     for i := 0 to LDataSet.Fields.Count -1 do
     begin
-	  LStrLine := LStrLine + LDataSet.Fields[i].AsString + ' - ';
-	end;
-	Writeln(LStrLine);
-	LDataSet.Next;
-  end;  
+      LStrLine := LStrLine + LDataSet.Fields[i].AsString + ' - ';
+    end;
+    Writeln(LStrLine);
+    LDataSet.Next;
+  end;
 
 finally
   LDataSet.Free;
