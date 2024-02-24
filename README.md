@@ -6,7 +6,8 @@ boss install github.com/coluce/provider
 
 ## ⚡️ Quickstart Delphi
 ```delphi
-uses provider;
+uses 
+  provider;
 
 var
   LProvider: IProviderDatabase;
