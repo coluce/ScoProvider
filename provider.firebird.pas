@@ -419,6 +419,7 @@ begin
     LIniFile := TIniFile.Create(FIniFilepath);
     try
       FConnectionInfo.Server := LIniFile.ReadString( 'database', 'server', '127.0.0.1' );
+      FConnectionInfo.Port := LIniFile.ReadInteger('database', 'port', 3050);
       FConnectionInfo.FileName := LIniFile.ReadString( 'database', 'name', '');
       FConnectionInfo.UserName := LIniFile.ReadString( 'database', 'username', 'sysdba');
       FConnectionInfo.Password := LIniFile.ReadString( 'database', 'password', 'masterkey');
@@ -430,16 +431,18 @@ begin
   if FConnectionInfo.FileName.Trim.IsEmpty then
     FConnectionInfo.FileName := ChangeFileExt(ParamStr(0), '.fdb');
 
-  LDataBasePath := ExtractFilePath(FConnectionInfo.FileName);
-  if not DirectoryExists(LDataBasePath) then
-    ForceDirectories(LDataBasePath);
+//  LDataBasePath := ExtractFilePath(FConnectionInfo.FileName);
+//  if not DirectoryExists(LDataBasePath) then
+//    ForceDirectories(LDataBasePath);
 
   if FConnection.Connected then
     FConnection.Close;
 
-  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(FConnectionInfo.FileName), True);
+//  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(FConnectionInfo.FileName), True);
+  FConnection.Params.Values['CreateDatabase'] := BoolToStr(False, True);
   FConnection.Params.Values['Database']:= FConnectionInfo.FileName;
   FConnection.Params.Values['Server']:= FConnectionInfo.Server;
+  FConnection.Params.Values['Port']:= FConnectionInfo.Port.ToString;
   FConnection.Params.UserName := FConnectionInfo.UserName;
   FConnection.Params.Password := FConnectionInfo.Password;
 end;

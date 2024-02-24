@@ -60,6 +60,7 @@ type
 
   TDatabaseInfo = record
     Server: string;
+    Port: integer;
     FileName: string;
     UserName: string;
     Password: string;
