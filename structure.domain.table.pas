@@ -12,11 +12,11 @@ type
   private
     FID: string;
     FName: string;
-    FFields: TDictionary<string, IField>;
+    FFields: TTableFields;
     FObs: string;
-  public
-
     constructor Create;
+  public
+    class function New: ITable;
     destructor Destroy; override;
 
     function ID: string; overload;
@@ -25,7 +25,7 @@ type
     function Name: string; overload;
     function Name(const Value: string): ITable; overload;
 
-    function Fields: TDictionary<string, IField>;
+    function Fields: TTableFields;
 
     function Obs: string; overload;
     function Obs(const Value: string): ITable; overload;
@@ -42,8 +42,13 @@ uses
 constructor TTable.Create;
 begin
   FID := TGUID.NewGuid.ToString;
-  FFields := TDictionary<string, IField>.Create;
+  FFields := TTableFields.Create;
   FObs := EmptyStr;
+end;
+
+class function TTable.New: ITable;
+begin
+  Result := Self.Create;
 end;
 
 destructor TTable.Destroy;
@@ -52,7 +57,7 @@ begin
   inherited;
 end;
 
-function TTable.Fields: TDictionary<string, IField>;
+function TTable.Fields: TTableFields;
 begin
   Result := FFields;
 end;

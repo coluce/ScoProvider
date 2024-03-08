@@ -42,6 +42,14 @@ type
 
   end;
 
+  TTableFields = class(TDictionary<string, IField>)
+  public
+    function PrimaryKeys: TArray<IField>;
+    function PrimaryKeyCount: integer;
+    function HasPrimaryKey: Boolean;
+    function OrderedByIndex: TArray<IField>;
+  end;
+
   ITable = interface
     ['{AEF9F64E-33D2-4433-A999-C3A8C8EF3F03}']
 
@@ -51,7 +59,7 @@ type
     function Name: string; overload;
     function Name(const Value: string): ITable; overload;
 
-    function Fields: TDictionary<string, IField>;
+    function Fields: TTableFields;
 
     function Obs: string; overload;
     function Obs(const Value: string): ITable; overload;
@@ -81,7 +89,10 @@ type
     function FillSequences(const AList: TStrings): IProviderDatabase;
     function FillTriggers(const ATableName: string; AList: TStrings): IProviderDatabase;
 
-    function ExistsField(const ATableName, AFieldName: string): boolean;
+    function CreateTable(const ATable: ITable): IProviderDatabase; overload;
+    function CreateTable(const ATable: ITable; const ADropIfExists: Boolean): IProviderDatabase; overload;
+    function FieldExists(const ATableName, AFieldName: string): boolean;
+    function TableExists(const ATableName: string): boolean;
 
     function ConnectionString: string;
 
@@ -127,7 +138,9 @@ implementation
 uses
   structure.domain.field,
   structure.domain.table,
-  provider.firebird;
+  provider.firebird,
+  System.SysUtils,
+  System.Generics.Defaults;
 
 { TProvider }
 
@@ -149,12 +162,78 @@ end;
 
 class function TStructureDomain.Field: IField;
 begin
-  Result := TField.Create;
+  Result := TField.New;
 end;
 
 class function TStructureDomain.Table: ITable;
 begin
-  Result := TTable.Create;
+  Result := TTable.New;
+end;
+
+{ TTableField }
+
+function TTableFields.HasPrimaryKey: Boolean;
+begin
+  Result := Self.PrimaryKeyCount > 0;
+end;
+
+function TTableFields.OrderedByIndex: TArray<IField>;
+var
+  LFields: TList<IField>;
+begin
+  LFields := TList<IField>.Create;
+  try
+    LFields.AddRange(Self.Values.ToArray);
+
+    LFields.Sort(TComparer<IField>.Construct(
+      function (const L, R: IField): integer
+      begin
+        if L.ID = R.ID then
+        begin
+          Result := 0;
+        end
+        else
+        begin
+          if L.ID < R.ID then
+          begin
+            Result := -1;
+          end
+          else
+          begin
+            Result := 1;
+          end;
+        end;
+      end
+    ));
+
+    Result := LFields.ToArray;
+
+  finally
+    LFields.Free;
+  end;
+end;
+
+function TTableFields.PrimaryKeyCount: integer;
+begin
+  Result := Length(Self.PrimaryKeys);
+end;
+
+function TTableFields.PrimaryKeys: TArray<IField>;
+var
+  LField: IField;
+  LFields: TArray<IField>;
+begin
+  SetLength(Result, 0);
+
+  LFields := Self.OrderedByIndex;
+  for LField in LFields do
+  begin
+    if LField.PrimaryKey then
+    begin
+      SetLength(Result, Length(Result) + 1);
+      Result[Length(Result) - 1] := LField;
+    end;
+  end;
 end;
 
 end.

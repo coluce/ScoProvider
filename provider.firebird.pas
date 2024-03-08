@@ -45,7 +45,10 @@ type
     function FillSequences(const AList: TStrings): IProviderDatabase;
     function FillTriggers(const ATableName: string; AList: TStrings): IProviderDatabase;
 
-    function ExistsField(const ATableName, AFieldName: string): boolean;
+    function CreateTable(const ATable: ITable): IProviderDatabase; overload;
+    function CreateTable(const ATable: ITable; const ADropIfExists: Boolean): IProviderDatabase; overload;
+    function FieldExists(const ATableName, AFieldName: string): boolean;
+    function TableExists(const ATableName: string): boolean;
 
     function ConnectionString: string;
 
@@ -81,7 +84,10 @@ uses
   System.IOUtils,
   System.IniFiles,
   System.SysUtils,
-  FireDAC.Phys.Intf;
+  system.strutils,
+  FireDAC.Phys.Intf,
+  System.Generics.Collections,
+  System.Generics.Defaults;
 
 { TProviderFirebird }
 
@@ -111,6 +117,132 @@ begin
   LoadDatabaseParams;
 end;
 
+function TProviderFirebird.CreateTable(const ATable: ITable): IProviderDatabase;
+begin
+  Result := Self.CreateTable(ATable, False);
+end;
+
+function TProviderFirebird.CreateTable(const ATable: ITable; const ADropIfExists: Boolean): IProviderDatabase;
+
+  function GetSqlFieldType(const AField: IField): string;
+  var
+    LFieldType: string;
+  begin
+    Result := AField.FieldType;
+    LFieldType := UpperCase(Result);
+    if
+      LFieldType.Equals('CHAR') or
+      LFieldType.Equals('VARCHAR')
+    then
+    begin
+      Result := Result + '(' + AField.FieldSize.ToString + ')';
+    end;
+  end;
+
+var
+  LSqlScript: TStrings;
+  LField: IField;
+  LFields: TArray<IField>;
+  LFieldsToCreate: TArray<IField>;
+  LPrimaryKeyFields: string;
+  LFieldCount: Integer;
+  i: integer;
+  LFieldListInDataBase: TStrings;
+begin
+
+  Result := Self;
+
+  if ADropIfExists then
+  begin
+    if TableExists(ATable.Name) then
+    begin
+      FConnection.ExecSQL('drop table ' + ATable.Name);
+    end;
+  end;
+
+  LSqlScript := TStringList.Create;
+  try
+
+    if
+      (not TableExists(ATable.Name)) and
+      (ATable.Fields.HasPrimaryKey)
+    then
+    begin
+
+      LFields := ATable.Fields.PrimaryKeys;
+
+      { primary key info }
+      LPrimaryKeyFields := EmptyStr;
+      LFieldCount := ATable.Fields.PrimaryKeyCount;
+
+      { table header }
+      LSqlScript.Clear;
+      LSqlScript.Add('create table ' + ATable.Name + ' (');
+      i := 0;
+      for LField in LFields do
+      begin
+        if LField.PrimaryKey then
+        begin
+          inc(i);
+          LSqlScript.Add('    ' + LField.Name + ' ' + GetSqlFieldType(LField) + ' not null' + IfThen(i < LFieldCount, ',', EmptyStr));
+          LPrimaryKeyFields := LPrimaryKeyFields + IfThen(LFieldCount > 1, ', ', EmptyStr) + LField.Name;
+        end;
+      end;
+      LSqlScript.Add(');');
+      FConnection.ExecSQL(LSqlScript.GetText);
+
+      LSqlScript.Clear;
+      LSqlScript.Add('alter table ' + ATable.Name + ' add constraint ' + UpperCase(ATable.Name) + '_PK primary key (' + LPrimaryKeyFields + ');');
+      FConnection.ExecSQL(LSqlScript.GetText);
+
+    end;
+
+    LFieldListInDataBase := TStringList.Create;
+    try
+      FConnection.GetFieldNames(EmptyStr, EmptyStr, ATable.Name, EmptyStr, LFieldListInDataBase);
+
+      SetLength(LFieldsToCreate, 0);
+
+      LFields := ATable.Fields.OrderedByIndex;
+      for LField in LFields do
+      begin
+        if not LField.PrimaryKey then
+        begin
+          if LFieldListInDataBase.IndexOf(UpperCase(LField.Name)) = -1 then
+          begin
+            SetLength(LFieldsToCreate, Length(LFieldsToCreate) + 1);
+            LFieldsToCreate[Length(LFieldsToCreate) - 1] := LField;
+          end;
+        end;
+      end;
+
+      LFieldCount := Length(LFieldsToCreate);
+      if LFieldCount > 0 then
+      begin
+        LSqlScript.Clear;
+        LSqlScript.Add('alter table ' + ATable.Name);
+        i := 0;
+        for LField in LFields do
+        begin
+          if not LField.PrimaryKey then
+          begin
+            inc(i);
+            LSqlScript.Add('    add ' + LField.Name + ' ' + GetSqlFieldType(LField) + IfThen(i < LFieldCount, ',', EmptyStr));
+          end;
+        end;
+        LSqlScript.Add(';');
+        FConnection.ExecSQL(LSqlScript.GetText);
+      end;
+
+    finally
+      LFieldListInDataBase.Free;
+    end;
+
+  finally
+    LSqlScript.Free;
+  end;
+end;
+
 destructor TProviderFirebird.Destroy;
 begin
   FQuery.Free;
@@ -130,7 +262,7 @@ begin
   ARowsAffected := FQuery.RowsAffected;
 end;
 
-function TProviderFirebird.ExistsField(const ATableName, AFieldName: string): boolean;
+function TProviderFirebird.FieldExists(const ATableName, AFieldName: string): boolean;
 var
   LList: TStrings;
 begin
@@ -532,6 +664,19 @@ begin
   Result := Self;
   if not FConnection.InTransaction then
     FConnection.StartTransaction;
+end;
+
+function TProviderFirebird.TableExists(const ATableName: string): boolean;
+var
+  LList: TStrings;
+begin
+  LList := TStringList.Create;
+  try
+    FillTableNames(LList);
+    Result := LList.IndexOf(ATableName) <> -1;
+  finally
+    LList.Free;
+  end;
 end;
 
 function TProviderFirebird.InTransaction: Boolean;

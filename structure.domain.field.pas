@@ -15,9 +15,10 @@ type
     FFieldType: string;
     FFieldSize: integer;
     FObs: string;
+    constructor Create;
   public
 
-    constructor Create;
+    class function New: IField;
 
     function ID: integer; overload;
     function ID(const Value: integer): IField; overload;
@@ -47,11 +48,6 @@ uses
 
 { TField }
 
-function TField.FieldType: string;
-begin
-  Result := FFieldType;
-end;
-
 constructor TField.Create;
 begin
   FID := -1;
@@ -60,6 +56,16 @@ begin
   FFieldType := EmptyStr;
   FFieldSize := -1;
   FObs := EmptyStr;
+end;
+
+class function TField.New: IField;
+begin
+  Result := Self.Create;
+end;
+
+function TField.FieldType: string;
+begin
+  Result := FFieldType.Trim;
 end;
 
 function TField.FieldSize(const Value: integer): IField;
