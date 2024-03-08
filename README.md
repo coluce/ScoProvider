@@ -92,7 +92,7 @@ begin
       LStrLine := EmptyStr;
       for i := 0 to LDataSet.Fields.Count -1 do
       begin
-      LStrLine := LStrLine + LDataSet.Fields[i].AsString + ';';
+        LStrLine := LStrLine + LDataSet.Fields[i].AsString + ';';
       end;
       Writeln(LStrLine);
       LDataSet.Next;
