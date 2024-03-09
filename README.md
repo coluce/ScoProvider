@@ -80,16 +80,17 @@ begin
 
     if not LDataSet.IsEmpty then
     begin
-    LDataSet.First;
-    while not LDataSet.Eof do
-    begin
-      LStrLine := EmptyStr;
-      for i := 0 to LDataSet.Fields.Count -1 do
+      LDataSet.First;
+      while not LDataSet.Eof do
       begin
-        LStrLine := LStrLine + LDataSet.Fields[i].AsString + ';';
+        LStrLine := EmptyStr;
+        for i := 0 to LDataSet.Fields.Count -1 do
+        begin
+          LStrLine := LStrLine + LDataSet.Fields[i].AsString + ';';
+        end;
+        Writeln(LStrLine);
+        LDataSet.Next;
       end;
-      Writeln(LStrLine);
-      LDataSet.Next;
     end;
 
   finally
