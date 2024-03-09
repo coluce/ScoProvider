@@ -4,33 +4,36 @@ Installation is done using the [`boss install`](https://github.com/HashLoad/boss
 boss install github.com/coluce/provider
 ```
 
-## ⚡️ Quickstart
+## ℹ️ Defining the connection data
 ```delphi
 uses 
   provider;
-
 var
   LProvider: IProviderDatabase;
   LDatabaseInfo: TDatabaseInfo;
-  LDataSet: TProviderMemTable;
-  LStrLine: string;
-  i: integer;
-  LTable: ITable;
-  LField: IField;
 begin
 
-  { definindo os dados de conexão ao banco de dados }
   LDatabaseInfo.Server := 'localhost';
   LDatabaseInfo.Port := 3050;
   LDatabaseInfo.FileName := 'my_firebird_database.fdb';
   LDatabaseInfo.UserName := 'SYSDBA';
   LDatabaseInfo.Password := 'my_secret_password';
 
-  { passando as propriedades de conexão ao Provider }
   LProvider := TProvider.Instance
     .SetDatabaseInfo(LDatabaseInfo);
 
-  { definindo a estrutura da tabela }
+end;
+```
+
+## 🆕 Creating a table
+```delphi
+uses 
+  provider;
+var
+  LTable: ITable;
+  LField: IField;
+begin
+
   LTable := TStructureDomain.Table;
   LTable.Name('TEST_TABLE');
 
@@ -52,10 +55,21 @@ begin
 
   LTable.Fields.AddOrSetValue(LField.Name, LField);
 
-  { criando a tabela no banco de dados }
   LProvider.CreateTable(LTable, True);
 
-  { inserindo registros }
+end;
+```
+
+## 👀 Manipulating Records
+```delphi
+uses 
+  provider;
+var
+  LDataSet: TProviderMemTable;
+  LStrLine: string;
+  i: integer;
+begin
+
   LStrLine := 'insert into ' + LTable.Name + ' (ID, Name) values (1, ' + QuotedStr('My Name') + ')';
   LProvider
     .Clear
@@ -97,6 +111,7 @@ begin
     LDataSet.Free;
   end;
 
+end;
 ```
 
 ## 📚 Delphi Versions
