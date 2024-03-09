@@ -21,6 +21,9 @@ var
   LTable: ITable;
   LField: IField;
 begin
+
+  ReportMemoryLeaksOnShutdown := True;
+
   Writeln('Provider - Example');
   try
 
