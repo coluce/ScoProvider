@@ -18,15 +18,19 @@ var
   LTable: ITable;
   LField: IField;
 begin
+
+  { definindo os dados de conexão ao banco de dados }
   LDatabaseInfo.Server := 'localhost';
   LDatabaseInfo.Port := 3050;
   LDatabaseInfo.FileName := 'my_firebird_database.fdb';
   LDatabaseInfo.UserName := 'SYSDBA';
   LDatabaseInfo.Password := 'my_secret_password';
 
+  { passando as propriedades de conexão ao Provider }
   LProvider := TProvider.Instance
     .SetDatabaseInfo(LDatabaseInfo);
 
+  { definindo a estrutura da tabela }
   LTable := TStructureDomain.Table;
   LTable.Name('TEST_TABLE');
 
@@ -48,33 +52,23 @@ begin
 
   LTable.Fields.AddOrSetValue(LField.Name, LField);
 
-  Writeln('');
-  Writeln('Database: ' + LDatabaseInfo.FileName);
-  Writeln('');
-
-  Writeln('aguarde ... criando tabela');
+  { criando a tabela no banco de dados }
   LProvider.CreateTable(LTable, True);
 
-  Writeln('');
-  Writeln('aguarde ... inserindo registros');
-
+  { inserindo registros }
   LStrLine := 'insert into ' + LTable.Name + ' (ID, Name) values (1, ' + QuotedStr('My Name') + ')';
-  Writeln('script 1: ' + LStrLine);
   LProvider
     .Clear
     .SetSQL(LStrLine)
     .Execute;
 
   LStrLine := 'insert into ' + LTable.Name + ' (ID, Name) values (2, ' + QuotedStr('Your Name') + ')';
-  Writeln('script 2: ' + LStrLine);
   LProvider
     .Clear
     .SetSQL(LStrLine)
     .Execute;
 
-  Writeln('');
-  Writeln('aguarde ... lendo registros');
-  Writeln('');
+  { lendo registros do banco de dados }
   LDataSet := TProviderMemTable.Create(nil);
   try
 
@@ -103,8 +97,6 @@ begin
   finally
     LDataSet.Free;
   end;
-
-  Writeln('Tudo OK!');
 
 ```
 
