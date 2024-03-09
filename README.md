@@ -92,8 +92,6 @@ begin
       LDataSet.Next;
     end;
 
-    end;
-
   finally
     LDataSet.Free;
   end;
