@@ -25,7 +25,7 @@ type
     FConnection: TFDConnection;
     FConnectionInfo: TDatabaseInfo;
     FQuery: TFDQuery;
-    FDataSet: TFDMemTable;
+    FDataSet: TProviderMemTable;
     FIniFilePath: string;
     procedure LoadDatabaseParams;
   public
@@ -66,7 +66,7 @@ type
     function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
     function SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
 
-    function SetDataset(ADataSet: TFDMemTable): IProviderDatabase;
+    function SetDataSet(var ADataSet: TProviderMemTable): IProviderDatabase;
     function Open: IProviderDatabase;
     function Execute: IProviderDatabase; overload;
     function Execute(out ARowsAffected: integer): IProviderDatabase; overload;
@@ -87,7 +87,7 @@ uses
   system.strutils,
   FireDAC.Phys.Intf,
   System.Generics.Collections,
-  System.Generics.Defaults;
+  System.Generics.Defaults, FireDAC.Comp.DataSet;
 
 { TProviderFirebird }
 
@@ -527,16 +527,27 @@ begin
 end;
 
 function TProviderFirebird.Open: IProviderDatabase;
+var
+  LDataSet: TFDQuery;
 begin
   Result := Self;
   if Assigned(FDataSet) then
   begin
-    if FDataSet.Active then
-    begin
-      FDataSet.EmptyDataSet;
+    LDataSet := TFDQuery.Create(FConnection);
+    try
+      LDataSet.Connection := FConnection;
+      LDataSet.SQL.Text := FQuery.SQL.Text;
+      LDataSet.Params.AssignValues(FQuery.Params);
+      LDataSet.Open;
+
+      FDataSet.CloneCursor(LDataSet);
+
+      { esse execsql cria um novo fdquery lá dentro, causando um memory leak }
+      //FConnection.ExecSQL(FQuery.SQL.Text, LDataSet);
+
+    finally
+      LDataSet.Free;
     end;
-    FQuery.Open;
-    FDataSet.CloneCursor(FQuery);
   end;
 end;
 
@@ -599,7 +610,7 @@ begin
   LoadDatabaseParams;
 end;
 
-function TProviderFirebird.SetDataset(ADataSet: TFDMemTable): IProviderDatabase;
+function TProviderFirebird.SetDataset(var ADataSet: TProviderMemTable): IProviderDatabase;
 begin
   Result := Self;
   FDataSet := ADataSet;
