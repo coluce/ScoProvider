@@ -24,6 +24,7 @@ type
   private
     FConnection: TFDConnection;
     FConnectionInfo: TDatabaseInfo;
+    // mais facil usar o FDQuery do que ter um obj de SQL e um de Param separados
     FQuery: TFDQuery;
     FDataSet: TProviderMemTable;
     FIniFilePath: string;
