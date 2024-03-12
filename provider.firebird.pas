@@ -257,9 +257,7 @@ end;
 function TProviderFirebird.Execute(out ARowsAffected: integer): IProviderDatabase;
 begin
   Result := Self;
-  ARowsAffected := -1;
-  FQuery.ExecSQL;
-  ARowsAffected := FQuery.RowsAffected;
+  ARowsAffected := FConnection.ExecSQL(FQuery.SQL.Text, FQuery.Params);
 end;
 
 function TProviderFirebird.FieldExists(const ATableName, AFieldName: string): boolean;
