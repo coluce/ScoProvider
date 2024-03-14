@@ -38,7 +38,7 @@ begin
   LTable.Name('TEST_TABLE');
 
   LField := TStructureDomain.Field
-    .ID(1)
+    .Index(1)
     .PrimaryKey(True)
     .Name('ID')
     .FieldType('INTEGER')
@@ -47,7 +47,7 @@ begin
   LTable.Fields.AddOrSetValue(LField.Name, LField);
 
   LField := TStructureDomain.Field
-    .ID(2)
+    .Index(2)
     .Name('NAME')
     .FieldType('VARCHAR')
     .FieldSize(100)
