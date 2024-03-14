@@ -310,7 +310,7 @@ begin
       while not LMetaInfoQuery.Eof do
       begin
         LField := TStructureDomain.Field
-          .ID(LMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
+          .Index(LMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
           .PrimaryKey(False)
           .Name(LMetaInfoQuery.FieldByName('COLUMN_NAME').AsString)
           .FieldType(LMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString)

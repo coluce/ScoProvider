@@ -9,7 +9,7 @@ type
 
   TField = class(TInterfacedObject, IField)
   private
-    FID: integer;
+    FIndex: integer;
     FPrimaryKey: Boolean;
     FName: string;
     FFieldType: string;
@@ -20,8 +20,8 @@ type
 
     class function New: IField;
 
-    function ID: integer; overload;
-    function ID(const Value: integer): IField; overload;
+    function Index: integer; overload;
+    function Index(const Value: integer): IField; overload;
 
     function PrimaryKey: Boolean; overload;
     function PrimaryKey(const Value: Boolean): IField; overload;
@@ -50,7 +50,7 @@ uses
 
 constructor TField.Create;
 begin
-  FID := -1;
+  FIndex := -1;
   FPrimaryKey := False;
   FName := EmptyStr;
   FFieldType := EmptyStr;
@@ -85,15 +85,15 @@ begin
   FFieldType := Value.trim;
 end;
 
-function TField.ID: integer;
+function TField.Index: integer;
 begin
-  Result := FID;
+  Result := FIndex;
 end;
 
-function TField.ID(const Value: integer): IField;
+function TField.Index(const Value: integer): IField;
 begin
   Result := Self;
-  FID := Value;
+  FIndex := Value;
 end;
 
 function TField.Name(const Value: string): IField;

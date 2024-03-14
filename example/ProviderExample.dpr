@@ -37,7 +37,7 @@ begin
     LTable.Name('TEST_TABLE');
 
     LField := TStructureDomain.Field
-      .ID(1)
+      .Index(1)
       .PrimaryKey(True)
       .Name('ID')
       .FieldType('INTEGER')
@@ -46,7 +46,7 @@ begin
     LTable.Fields.AddField(LField);
 
     LField := TStructureDomain.Field
-      .ID(2)
+      .Index(2)
       .Name('Name')
       .FieldType('VARCHAR')
       .FieldSize(100)
@@ -55,7 +55,7 @@ begin
     LTable.Fields.AddField(LField);
 
     LField := TStructureDomain.Field
-      .ID(3)
+      .Index(3)
       .Name('Active')
       .FieldType('BOOLEAN');
 

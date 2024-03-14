@@ -22,8 +22,8 @@ type
   IField = interface
     ['{29D1BC0C-62BA-4016-A621-6219141961FA}']
 
-    function ID: integer; overload;
-    function ID(const Value: integer): IField; overload;
+    function Index: integer; overload;
+    function Index(const Value: integer): IField; overload;
 
     function PrimaryKey: Boolean; overload;
     function PrimaryKey(const Value: Boolean): IField; overload;
@@ -194,13 +194,13 @@ begin
     LFields.Sort(TComparer<IField>.Construct(
       function (const L, R: IField): integer
       begin
-        if L.ID = R.ID then
+        if L.Index = R.Index then
         begin
           Result := 0;
         end
         else
         begin
-          if L.ID < R.ID then
+          if L.Index < R.Index then
           begin
             Result := -1;
           end
