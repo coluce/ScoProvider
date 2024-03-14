@@ -43,7 +43,7 @@ begin
       .FieldType('INTEGER')
       .Obs('My Primary Key');
 
-    LTable.Fields.AddOrSetValue(LField.Name, LField);
+    LTable.Fields.AddField(LField);
 
     LField := TStructureDomain.Field
       .ID(2)
@@ -52,14 +52,14 @@ begin
       .FieldSize(100)
       .Obs('Name of the entity');
 
-    LTable.Fields.AddOrSetValue(LField.Name, LField);
+    LTable.Fields.AddField(LField);
 
     LField := TStructureDomain.Field
       .ID(3)
       .Name('Active')
       .FieldType('BOOLEAN');
 
-    LTable.Fields.AddOrSetValue(LField.Name, LField);
+    LTable.Fields.AddField(LField);
 
     LProvider := TProvider.Instance
       .SetDatabaseInfo(LDatabaseInfo);

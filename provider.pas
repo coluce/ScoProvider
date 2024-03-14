@@ -48,6 +48,7 @@ type
     function PrimaryKeyCount: integer;
     function HasPrimaryKey: Boolean;
     function OrderedByIndex: TArray<IField>;
+    procedure AddField(const AField: IField);
   end;
 
   ITable = interface
@@ -171,6 +172,11 @@ begin
 end;
 
 { TTableField }
+
+procedure TTableFields.AddField(const AField: IField);
+begin
+  Self.AddOrSetValue(AField.Name, AField);
+end;
 
 function TTableFields.HasPrimaryKey: Boolean;
 begin
