@@ -565,8 +565,26 @@ begin
     end;
   end;
 
+  if FConnectionInfo.Server.Trim.IsEmpty then
+    FConnectionInfo.Server := '127.0.0.1';
+
+  if FConnectionInfo.Port < 1 then
+    FConnectionInfo.Port := 3050;
+
   if FConnectionInfo.FileName.Trim.IsEmpty then
     FConnectionInfo.FileName := ChangeFileExt(ParamStr(0), '.fdb');
+
+  if FConnectionInfo.CharacterSet.Trim.IsEmpty then
+    FConnectionInfo.CharacterSet := 'UTF8';
+
+  if FConnectionInfo.Protocol.Trim.IsEmpty then
+    FConnectionInfo.Protocol := 'TCPIP';
+
+  if FConnectionInfo.UserName.Trim.IsEmpty then
+    FConnectionInfo.UserName := 'SYSDBA';
+
+  if FConnectionInfo.Password.Trim.IsEmpty then
+    FConnectionInfo.Password := 'masterkey';
 
   LConnectionString :=
      'Database=' + FConnectionInfo.FileName + ';' +
