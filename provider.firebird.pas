@@ -62,6 +62,7 @@ type
     function SetTimeParam(const AName: string; const AValue: TTime): IProviderDatabase;
 
     function SetStringParam(const AName: string; const AValue: string): IProviderDatabase;
+    function SetWideStringParam(const AName: string; const AValue: string): IProviderDatabase;
     function SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
     function SetFloatParam(const AName: string; const AValue: Double): IProviderDatabase;
     function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
@@ -111,10 +112,12 @@ end;
 constructor TProviderFirebird.Create;
 begin
   FIniFilePath := ChangeFileExt(ParamStr(0), '.conf');
+
   FConnection := TFDConnection.Create(nil);
-  FConnection.DriverName := 'FB';
+
   FQuery := TFDQuery.Create(FConnection);
   FQuery.Connection := FConnection;
+
   LoadDatabaseParams;
 end;
 
@@ -552,8 +555,8 @@ end;
 
 procedure TProviderFirebird.LoadDatabaseParams;
 var
-//  LDataBasePath: string;
   LIniFile: TIniFile;
+  LConnectionString: string;
 begin
 
   if not FIniFilePath.Trim.IsEmpty then
@@ -573,20 +576,36 @@ begin
   if FConnectionInfo.FileName.Trim.IsEmpty then
     FConnectionInfo.FileName := ChangeFileExt(ParamStr(0), '.fdb');
 
-//  LDataBasePath := ExtractFilePath(FConnectionInfo.FileName);
-//  if not DirectoryExists(LDataBasePath) then
-//    ForceDirectories(LDataBasePath);
+  LConnectionString :=
+     'Database=' + FConnectionInfo.FileName + ';' +
+     'User_Name=' + FConnectionInfo.UserName + ';' +
+     'Password=' + FConnectionInfo.Password + ';' +
+     'Server=' + FConnectionInfo.Server + ';' +
+     'Port=' + FConnectionInfo.Port.ToString + ';' +
+     'Protocol=TCPIP;' +
+     'CharacterSet=UTF8;' +
+     'DriverID=FB';
 
   if FConnection.Connected then
     FConnection.Close;
 
+  FConnection.ConnectionString := LConnectionString;
+
+//  var LDataBasePath: string;
+
+//  LDataBasePath := ExtractFilePath(FConnectionInfo.FileName);
+//  if not DirectoryExists(LDataBasePath) then
+//    ForceDirectories(LDataBasePath);
+
 //  FConnection.Params.Values['CreateDatabase'] := BoolToStr(not FileExists(FConnectionInfo.FileName), True);
-  FConnection.Params.Values['CreateDatabase'] := BoolToStr(False, True);
-  FConnection.Params.Values['Database']:= FConnectionInfo.FileName;
-  FConnection.Params.Values['Server']:= FConnectionInfo.Server;
-  FConnection.Params.Values['Port']:= FConnectionInfo.Port.ToString;
-  FConnection.Params.UserName := FConnectionInfo.UserName;
-  FConnection.Params.Password := FConnectionInfo.Password;
+//  FConnection.DriverName := 'FB';
+//  FConnection.Params.Values['CreateDatabase'] := BoolToStr(False, True);
+//  FConnection.Params.Values['Database']:= FConnectionInfo.FileName;
+//  FConnection.Params.Values['Server']:= FConnectionInfo.Server;
+//  FConnection.Params.Values['Port']:= FConnectionInfo.Port.ToString;
+//  FConnection.Params.Add('CharacterSet=UTF8');
+//  FConnection.Params.UserName := FConnectionInfo.UserName;
+//  FConnection.Params.Password := FConnectionInfo.Password;
 end;
 
 function TProviderFirebird.SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
@@ -667,6 +686,12 @@ function TProviderFirebird.SetTimeParam(const AName: string; const AValue: TTime
 begin
   Result := Self;
   FQuery.ParamByName(AName).AsTime := AValue;
+end;
+
+function TProviderFirebird.SetWideStringParam(const AName, AValue: string): IProviderDatabase;
+begin
+  Result := Self;
+  FQuery.ParamByName(AName).AsWideString := AValue;
 end;
 
 function TProviderFirebird.StartTransaction: IProviderDatabase;

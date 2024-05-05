@@ -104,6 +104,7 @@ type
     function SetDateParam(const AName: string; const AValue: TDate): IProviderDatabase;
     function SetTimeParam(const AName: string; const AValue: TTime): IProviderDatabase;
     function SetStringParam(const AName: string; const AValue: string): IProviderDatabase;
+    function SetWideStringParam(const AName: string; const AValue: string): IProviderDatabase;
     function SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;
     function SetFloatParam(const AName: string; const AValue: Double): IProviderDatabase;
     function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
