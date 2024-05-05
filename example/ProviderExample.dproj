@@ -87,10 +87,10 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\provider.firebird.pas"/>
-        <DCCReference Include="..\provider.pas"/>
-        <DCCReference Include="..\structure.domain.field.pas"/>
-        <DCCReference Include="..\structure.domain.table.pas"/>
+        <DCCReference Include="..\Sco.Provider.Firebird.pas"/>
+        <DCCReference Include="..\Sco.Provider.pas"/>
+        <DCCReference Include="..\Sco.Provider.Domain.Field.pas"/>
+        <DCCReference Include="..\Sco.Provider.Domain.Table.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

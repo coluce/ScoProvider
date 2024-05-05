@@ -1,10 +1,9 @@
-unit structure.domain.table;
+unit Sco.Provider.Domain.Table;
 
 interface
 
 uses
-  System.Generics.Collections,
-  provider;
+  System.Generics.Collections, Sco.Provider;
 
 type
 

@@ -1,21 +1,11 @@
-unit provider.firebird;
+unit Sco.Provider.Firebird;
 
 interface
 
 uses
-  provider,
-  Data.DB,
-  FireDAC.Stan.Def,
-  FireDAC.Phys.FBDef,
-  FireDAC.Stan.Intf,
-  FireDAC.Stan.ASync,
-  FireDAC.Phys,
-  FireDAC.Phys.IBBase,
-  FireDAC.Phys.FB,
-  FireDAC.DApt,
-  FireDAC.Comp.Client,
-  FireDAC.Stan.Param,
-  FireDAC.VCLUI.Wait,
+  Sco.Provider, Data.DB, FireDAC.Stan.Def, FireDAC.Phys.FBDef, FireDAC.Stan.Intf,
+  FireDAC.Stan.ASync, FireDAC.Phys, FireDAC.Phys.IBBase, FireDAC.Phys.FB,
+  FireDAC.DApt, FireDAC.Comp.Client, FireDAC.Stan.Param, FireDAC.VCLUI.Wait,
   System.Classes;
 
 type
@@ -566,6 +556,8 @@ begin
       FConnectionInfo.Server := LIniFile.ReadString( 'database', 'server', '127.0.0.1' );
       FConnectionInfo.Port := LIniFile.ReadInteger('database', 'port', 3050);
       FConnectionInfo.FileName := LIniFile.ReadString( 'database', 'name', '');
+      FConnectionInfo.CharacterSet := LIniFile.ReadString( 'database', 'charset', 'UTF8');
+      FConnectionInfo.Protocol := LIniFile.ReadString( 'database', 'protocol', 'TCPIP');
       FConnectionInfo.UserName := LIniFile.ReadString( 'database', 'username', 'sysdba');
       FConnectionInfo.Password := LIniFile.ReadString( 'database', 'password', 'masterkey');
     finally
@@ -582,8 +574,8 @@ begin
      'Password=' + FConnectionInfo.Password + ';' +
      'Server=' + FConnectionInfo.Server + ';' +
      'Port=' + FConnectionInfo.Port.ToString + ';' +
-     'Protocol=TCPIP;' +
-     'CharacterSet=UTF8;' +
+     'Protocol=' + FConnectionInfo.Protocol + ';' +
+     'CharacterSet=' + FConnectionInfo.CharacterSet + ';' +
      'DriverID=FB';
 
   if FConnection.Connected then

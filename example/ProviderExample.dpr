@@ -7,16 +7,16 @@ program ProviderExample;
 uses
   System.SysUtils,
   Data.DB,
-  provider.firebird in '..\provider.firebird.pas',
-  provider in '..\provider.pas',
-  structure.domain.field in '..\structure.domain.field.pas',
-  structure.domain.table in '..\structure.domain.table.pas';
+  Sco.Provider.Firebird in '..\Sco.Provider.Firebird.pas',
+  Sco.Provider in '..\Sco.Provider.pas',
+  Sco.Provider.Domain.Field in '..\Sco.Provider.Domain.Field.pas',
+  Sco.Provider.Domain.Table in '..\Sco.Provider.Domain.Table.pas';
 
 var
   LDatabaseInfo: TDatabaseInfo;
   LProvider: IProviderDatabase;
   LDataSet: TProviderMemTable;
-  i: integer;
+  LIndex: Integer;
   LStrLine: string;
   LTable: ITable;
   LField: IField;
@@ -30,6 +30,8 @@ begin
     LDatabaseInfo.Server := 'localhost';
     LDatabaseInfo.Port := 3051;
     LDatabaseInfo.FileName := 'deathstar.fdb';
+    LDatabaseInfo.Protocol := 'TCPIP';
+    LDatabaseInfo.CharacterSet := 'UTF8';
     LDatabaseInfo.UserName := 'SYSDBA';
     LDatabaseInfo.Password := '1709d7c5c7eb4f910115';
 
@@ -115,9 +117,11 @@ begin
         while not LDataSet.Eof do
         begin
           LStrLine := EmptyStr;
-          for i := 0 to LDataSet.Fields.Count -1 do
+          for LIndex := 0 to LDataSet.Fields.Count -1 do
           begin
-            LStrLine := LStrLine + LDataSet.Fields[i].FieldName + ' : ' + QuotedStr(LDataSet.Fields[i].AsString) + ' ';
+            LStrLine :=
+              LStrLine + LDataSet.Fields[LIndex].FieldName + ' : ' +
+              QuotedStr(LDataSet.Fields[LIndex].AsString) + ' ';
           end;
           Writeln(LStrLine);
           LDataSet.Next;
@@ -141,9 +145,11 @@ begin
         while not LDataSet.Eof do
         begin
           LStrLine := EmptyStr;
-          for i := 0 to LDataSet.Fields.Count -1 do
+          for LIndex := 0 to LDataSet.Fields.Count -1 do
           begin
-            LStrLine := LStrLine + LDataSet.Fields[i].FieldName + ' : ' + QuotedStr(LDataSet.Fields[i].AsString) + ' ';
+            LStrLine :=
+              LStrLine + LDataSet.Fields[LIndex].FieldName + ' : ' +
+              QuotedStr(LDataSet.Fields[LIndex].AsString) + ' ';
           end;
           Writeln(LStrLine);
           LDataSet.Next;
@@ -167,9 +173,11 @@ begin
         while not LDataSet.Eof do
         begin
           LStrLine := EmptyStr;
-          for i := 0 to LDataSet.Fields.Count -1 do
+          for LIndex := 0 to LDataSet.Fields.Count -1 do
           begin
-            LStrLine := LStrLine + LDataSet.Fields[i].FieldName + ' : ' + QuotedStr(LDataSet.Fields[i].AsString) + ' ';
+            LStrLine :=
+              LStrLine + LDataSet.Fields[LIndex].FieldName + ' : ' +
+              QuotedStr(LDataSet.Fields[LIndex].AsString) + ' ';
           end;
           Writeln(LStrLine);
           LDataSet.Next;

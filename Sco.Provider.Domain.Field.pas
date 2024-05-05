@@ -1,9 +1,9 @@
-unit structure.domain.field;
+unit Sco.Provider.Domain.Field;
 
 interface
 
 uses
-  provider;
+  Sco.Provider;
 
 type
 
@@ -43,8 +43,7 @@ type
 implementation
 
 uses
-  system.sysutils,
-  system.strutils;
+  System.SysUtils, System.StrUtils;
 
 { TField }
 

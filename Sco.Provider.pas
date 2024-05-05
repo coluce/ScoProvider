@@ -1,12 +1,9 @@
-unit provider;
+unit Sco.Provider;
 
 interface
 
 uses
-  Data.DB,
-  FireDAC.Comp.Client,
-  System.Classes,
-  System.Generics.Collections;
+  Data.DB, FireDAC.Comp.Client, System.Classes, System.Generics.Collections;
 
 type
 
@@ -73,6 +70,8 @@ type
     FileName: string;
     UserName: string;
     Password: string;
+    CharacterSet: string;
+    Protocol: string;
   end;
 
   IProviderDatabase = interface
@@ -138,11 +137,8 @@ type
 implementation
 
 uses
-  structure.domain.field,
-  structure.domain.table,
-  provider.firebird,
-  System.SysUtils,
-  System.Generics.Defaults;
+  Sco.Provider.Domain.Field, Sco.Provider.Domain.Table, Sco.Provider.Firebird,
+  System.SysUtils, System.Generics.Defaults;
 
 { TProvider }
 
