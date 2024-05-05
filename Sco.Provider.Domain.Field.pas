@@ -14,10 +14,10 @@ type
     FName: string;
     FFieldType: string;
     FFieldSize: integer;
+    FCharacterSet: string;
     FObs: string;
-    constructor Create;
   public
-
+    constructor Create;
     class function New: IField;
 
     function Index: integer; overload;
@@ -35,6 +35,9 @@ type
     function FieldSize: integer; overload;
     function FieldSize(const Value: integer): IField; overload;
 
+    function CharacterSet: string; overload;
+    function CharacterSet(const Value: string): IField; overload;
+
     function Obs: string; overload;
     function Obs(const Value: string): IField; overload;
 
@@ -46,6 +49,17 @@ uses
   System.SysUtils, System.StrUtils;
 
 { TField }
+
+function TField.CharacterSet(const Value: string): IField;
+begin
+  Result := Self;
+  FCharacterSet := Value;
+end;
+
+function TField.CharacterSet: string;
+begin
+  Result := FCharacterSet;
+end;
 
 constructor TField.Create;
 begin

@@ -34,6 +34,9 @@ type
     function FieldSize: integer; overload;
     function FieldSize(const Value: integer): IField; overload;
 
+    function CharacterSet: string; overload;
+    function CharacterSet(const Value: string): IField; overload;
+
     function Obs: string; overload;
     function Obs(const Value: string): IField; overload;
 

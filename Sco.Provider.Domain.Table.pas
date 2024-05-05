@@ -13,8 +13,8 @@ type
     FName: string;
     FFields: TTableFields;
     FObs: string;
-    constructor Create;
   public
+    constructor Create;
     class function New: ITable;
     destructor Destroy; override;
 
