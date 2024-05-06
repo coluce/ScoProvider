@@ -130,7 +130,20 @@ function TProviderFirebird.CreateTable(const ATable: ITable; const ADropIfExists
     then
     begin
       Result := Result + '(' + AField.FieldSize.ToString + ')';
+      if not AField.CharacterSet.Trim.IsEmpty then
+         Result := Result + ' CHARACTER SET ' + AField.CharacterSet;
     end;
+
+    if
+      LFieldType.Equals('BLOB SUB_TYPE 1') or
+      LFieldType.Equals('BLOB SUB_TYPE TEXT')
+    then
+    begin
+      if not AField.CharacterSet.Trim.IsEmpty then
+         Result := Result + ' CHARACTER SET ' + AField.CharacterSet;
+    end;
+
+    Result := UpperCase(Result);
   end;
 
 var
