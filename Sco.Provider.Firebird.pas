@@ -192,7 +192,10 @@ begin
         begin
           inc(i);
           LSqlScript.Add('    ' + LField.Name + ' ' + GetSqlFieldType(LField) + ' not null' + IfThen(i < LFieldCount, ',', EmptyStr));
-          LPrimaryKeyFields := LPrimaryKeyFields + IfThen(LFieldCount > 1, ', ', EmptyStr) + LField.Name;
+          if LPrimaryKeyFields.Trim.IsEmpty then
+            LPrimaryKeyFields := LField.Name
+          else
+            LPrimaryKeyFields := LPrimaryKeyFields + IfThen(LFieldCount > 1, ', ', EmptyStr) + LField.Name;
         end;
       end;
       LSqlScript.Add(');');
@@ -547,7 +550,7 @@ begin
 
       FDataSet.CloneCursor(LDataSet);
 
-      { esse execsql cria um novo fdquery l· dentro, causando um memory leak }
+      { esse execsql cria um novo fdquery l√° dentro, causando um memory leak }
       //FConnection.ExecSQL(FQuery.SQL.Text, LDataSet);
 
     finally
