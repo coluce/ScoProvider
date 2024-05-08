@@ -49,6 +49,13 @@ type
     function HasPrimaryKey: Boolean;
     function OrderedByIndex: TArray<IField>;
     procedure AddField(const AField: IField);
+    function AddIntegerField(const AIndex: integer; const AName: string): IField;
+    function AddFloatField(const AIndex: integer; const AName: string; const ASize: integer = 15; APrecision: integer = 2): IField;
+    function AddStringField(const AIndex: integer; const AName: string; const ASize: integer; const ACharSet: string = 'NONE'): IField;
+    function AddBlobTextField(const AIndex: integer; const AName: string; const ACharSet: string): IField;
+    function AddBlobBinaryField(const AIndex: integer; const AName: string): IField;
+    function AddDateTimeField(const AIndex: integer; const AName: string): IField;
+    function AddBooleanField(const AIndex: integer; const AName: string): IField;
   end;
 
   ITable = interface
@@ -173,9 +180,80 @@ end;
 
 { TTableField }
 
+function TTableFields.AddBlobBinaryField(const AIndex: integer; const AName: string): IField;
+begin
+  Result := TStructureDomain.Field
+    .Index(AIndex)
+    .Name(AName)
+    .FieldType('BLOB SUB_TYPE 0 SEGMENT SIZE 80');
+  Self.AddField(Result);
+end;
+
+function TTableFields.AddBlobTextField(const AIndex: integer; const AName: string; const ACharSet: string): IField;
+begin
+  Result := TStructureDomain.Field
+    .Index(AIndex)
+    .Name(AName)
+    .FieldType('BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+    .CharacterSet(ACharSet);
+  Self.AddField(Result);
+end;
+
+function TTableFields.AddBooleanField(const AIndex: integer; const AName: string): IField;
+begin
+  Result := TStructureDomain.Field
+    .Index(AIndex)
+    .Name(AName)
+    .FieldType('BOOLEAN');
+  Self.AddField(Result);
+end;
+
+function TTableFields.AddDateTimeField(const AIndex: integer; const AName: string): IField;
+begin
+  Result := TStructureDomain.Field
+    .Index(AIndex)
+    .Name(AName)
+    .FieldType('TIMESTAMP');
+  Self.AddField(Result);
+end;
+
 procedure TTableFields.AddField(const AField: IField);
 begin
   Self.AddOrSetValue(AField.Name, AField);
+end;
+
+function TTableFields.AddFloatField(const AIndex: integer; const AName: string; const ASize: integer = 15; APrecision: integer = 2): IField;
+var
+  LType: string;
+begin
+  LType := 'NUMERIC(' + ASize.ToString + ',' + APrecision.ToString + ')';
+  Result := TStructureDomain.Field
+    .Index(AIndex)
+    .Name(AName)
+    .FieldType(LType);
+  Self.AddField(Result);
+end;
+
+function TTableFields.AddIntegerField(const AIndex: integer; const AName: string): IField;
+begin
+  Result := TStructureDomain.Field
+    .Index(AIndex)
+    .Name(AName)
+    .FieldType('INTEGER');
+  Self.AddField(Result);
+end;
+
+function TTableFields.AddStringField(const AIndex: integer; const AName: string; const ASize: integer; const ACharSet: string): IField;
+begin
+  Result := TStructureDomain.Field
+    .Index(AIndex)
+    .Name(AName)
+    .FieldType('VARCHAR')
+    .FieldSize(ASize);
+  if UpperCase(ACharSet.Trim) <> 'NONE' then
+    Result
+      .CharacterSet(ACharSet);
+  Self.AddField(Result);
 end;
 
 function TTableFields.HasPrimaryKey: Boolean;

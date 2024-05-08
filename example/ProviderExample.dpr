@@ -37,31 +37,12 @@ begin
 
     LTable := TStructureDomain.Table;
     LTable.Name('TEST_TABLE');
-
-    LField := TStructureDomain.Field
-      .Index(1)
-      .PrimaryKey(True)
-      .Name('ID')
-      .FieldType('INTEGER')
-      .Obs('My Primary Key');
-
-    LTable.Fields.AddField(LField);
-
-    LField := TStructureDomain.Field
-      .Index(2)
-      .Name('Name')
-      .FieldType('VARCHAR')
-      .FieldSize(100)
-      .Obs('Name of the entity');
-
-    LTable.Fields.AddField(LField);
-
-    LField := TStructureDomain.Field
-      .Index(3)
-      .Name('Active')
-      .FieldType('BOOLEAN');
-
-    LTable.Fields.AddField(LField);
+    LTable.Fields
+      .AddIntegerField(1, 'ID')
+        .PrimaryKey(True)
+        .Obs('My primary key');
+    LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8');
+    LTable.Fields.AddBooleanField(3, 'ACTIVE');
 
     LProvider := TProvider.Instance
       .SetDatabaseInfo(LDatabaseInfo);
@@ -76,27 +57,27 @@ begin
     Writeln('');
     Writeln('waiting ... creating records');
 
-    LStrLine := 'insert into TEST_TABLE (ID, Name, Active) values (:ID, :Name, :Active)';
+    LStrLine := 'insert into TEST_TABLE (ID, NAME, ACTIVE) values (:ID, :NAME, :ACTIVE)';
     Writeln('script: ' + LStrLine);
 
     LProvider
       .Clear
       .SetSQL(LStrLine)
       .SetIntegerParam('ID', 1)
-      .SetStringParam('Name', 'My Name')
-      .SetBooleanParam('Active', True)
+      .SetStringParam('NAME', 'My Name')
+      .SetBooleanParam('ACTIVE', True)
       .Execute;
 
     LProvider
       .SetIntegerParam('ID', 2)
-      .SetStringParam('Name', 'Your Name')
-      .SetBooleanParam('Active', True)
+      .SetStringParam('NAME', 'Your Name')
+      .SetBooleanParam('ACTIVE', True)
       .Execute;
 
     LProvider
       .SetIntegerParam('ID', 3)
-      .SetStringParam('Name', 'Nobody')
-      .SetBooleanParam('Active', False)
+      .SetStringParam('NAME', 'Nobody')
+      .SetBooleanParam('ACTIVE', False)
       .Execute;
 
     Writeln('');
@@ -107,7 +88,7 @@ begin
 
       LProvider
         .Clear
-        .SetSQL('select * from TEST_TABLE where Active')
+        .SetSQL('select * from TEST_TABLE where ACTIVE')
         .SetDataset(LDataSet)
         .Open;
 

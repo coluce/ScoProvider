@@ -7,7 +7,7 @@ boss install github.com/coluce/provider
 ## ℹ️ Defining the connection data
 ```delphi
 uses 
-  provider;
+  Sco.Provider;
 var
   LProvider: IProviderDatabase;
   LDatabaseInfo: TDatabaseInfo;
@@ -28,33 +28,23 @@ end;
 ## 🆕 Creating a table
 ```delphi
 uses 
-  provider;
+  Sco.Provider;
 var
   LTable: ITable;
   LField: IField;
 begin
 
+  { define table structure }
   LTable := TStructureDomain.Table;
   LTable.Name('TEST_TABLE');
+  LTable.Fields
+    .AddIntegerField(1, 'ID')
+      .PrimaryKey(True)
+      .Obs('My primary key');
+  LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8');
+  LTable.Fields.AddBooleanField(3, 'ACTIVE');
 
-  LField := TStructureDomain.Field
-    .Index(1)
-    .PrimaryKey(True)
-    .Name('ID')
-    .FieldType('INTEGER')
-    .Obs('My Primary Key');
-
-  LTable.Fields.AddOrSetValue(LField.Name, LField);
-
-  LField := TStructureDomain.Field
-    .Index(2)
-    .Name('NAME')
-    .FieldType('VARCHAR')
-    .FieldSize(100)
-    .Obs('Name of the entity');
-
-  LTable.Fields.AddOrSetValue(LField.Name, LField);
-
+  { create table in database }
   LProvider.CreateTable(LTable, True);
 
 end;
@@ -63,7 +53,7 @@ end;
 ## 👀 Manipulating Records
 ```delphi
 uses 
-  provider;
+  Sco.Provider;
 var
   LDataSet: TProviderMemTable;
   LStrLine: string;

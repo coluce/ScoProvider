@@ -1,4 +1,4 @@
-unit Sco.Provider.Firebird;
+﻿unit Sco.Provider.Firebird;
 
 interface
 
@@ -159,6 +159,9 @@ begin
 
   Result := Self;
 
+  if not ATable.Fields.HasPrimaryKey then
+    raise Exception.Create('No Primary Key for Table "' + ATable.Name + '".');
+
   if ADropIfExists then
   begin
     if TableExists(ATable.Name) then
@@ -170,10 +173,7 @@ begin
   LSqlScript := TStringList.Create;
   try
 
-    if
-      (not TableExists(ATable.Name)) and
-      (ATable.Fields.HasPrimaryKey)
-    then
+    if not TableExists(ATable.Name) then
     begin
 
       LFields := ATable.Fields.PrimaryKeys;
