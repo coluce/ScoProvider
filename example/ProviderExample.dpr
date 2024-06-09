@@ -19,7 +19,6 @@ var
   LIndex: Integer;
   LStrLine: string;
   LTable: ITable;
-  LField: IField;
 begin
 
   ReportMemoryLeaksOnShutdown := True;

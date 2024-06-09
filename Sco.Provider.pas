@@ -55,7 +55,7 @@ type
     function AddIntegerField(const AIndex: integer; const AName: string): IField;
     function AddFloatField(const AIndex: integer; const AName: string; const ASize: integer = 15; APrecision: integer = 2): IField;
     function AddStringField(const AIndex: integer; const AName: string; const ASize: integer; const ACharSet: string = 'NONE'): IField;
-    function AddBlobTextField(const AIndex: integer; const AName: string; const ACharSet: string): IField;
+    function AddBlobTextField(const AIndex: integer; const AName: string; const ACharSet: string = 'NONE'): IField;
     function AddBlobBinaryField(const AIndex: integer; const AName: string): IField;
     function AddDateTimeField(const AIndex: integer; const AName: string): IField;
     function AddBooleanField(const AIndex: integer; const AName: string): IField;
