@@ -73,13 +73,9 @@ type
 implementation
 
 uses
-  System.IOUtils,
-  System.IniFiles,
-  System.SysUtils,
-  system.strutils,
-  FireDAC.Phys.Intf,
-  System.Generics.Collections,
-  System.Generics.Defaults, FireDAC.Comp.DataSet;
+  System.IOUtils, System.IniFiles, System.SysUtils, System.Strutils,
+  FireDAC.Phys.Intf, System.Generics.Collections, System.Generics.Defaults,
+  FireDAC.Comp.DataSet;
 
 { TProviderFirebird }
 
@@ -142,6 +138,9 @@ function TProviderFirebird.CreateTable(const ATable: ITable; const ADropIfExists
       if not AField.CharacterSet.Trim.IsEmpty then
          Result := Result + ' CHARACTER SET ' + AField.CharacterSet;
     end;
+
+    if AField.NotNull then
+      Result := Result + ' NOT NULL';
 
     Result := UpperCase(Result);
   end;

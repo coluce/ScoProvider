@@ -25,6 +25,9 @@ type
     function PrimaryKey: Boolean; overload;
     function PrimaryKey(const Value: Boolean): IField; overload;
 
+    function NotNull: Boolean; overload;
+    function NotNull(const Value: Boolean): IField; overload;
+
     function Name: string; overload;
     function Name(const Value: string): IField; overload;
 

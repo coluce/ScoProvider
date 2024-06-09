@@ -11,6 +11,7 @@ type
   private
     FIndex: integer;
     FPrimaryKey: Boolean;
+    FNotNull: Boolean;
     FName: string;
     FFieldType: string;
     FFieldSize: integer;
@@ -25,6 +26,9 @@ type
 
     function PrimaryKey: Boolean; overload;
     function PrimaryKey(const Value: Boolean): IField; overload;
+
+    function NotNull: Boolean; overload;
+    function NotNull(const Value: Boolean): IField; overload;
 
     function Name: string; overload;
     function Name(const Value: string): IField; overload;
@@ -50,22 +54,12 @@ uses
 
 { TField }
 
-function TField.CharacterSet(const Value: string): IField;
-begin
-  Result := Self;
-  FCharacterSet := Value;
-end;
-
-function TField.CharacterSet: string;
-begin
-  Result := FCharacterSet;
-end;
-
 constructor TField.Create;
 begin
   FIndex := -1;
   FPrimaryKey := False;
   FName := EmptyStr;
+  FNotNull := False;
   FFieldType := EmptyStr;
   FFieldSize := -1;
   FObs := EmptyStr;
@@ -109,23 +103,6 @@ begin
   FIndex := Value;
 end;
 
-function TField.Name(const Value: string): IField;
-begin
-  Result := Self;
-  FName := trim(ReplaceStr(Value, '"', ''));
-end;
-
-function TField.Obs(const Value: string): IField;
-begin
-  Result := Self;
-  FObs := Value;
-end;
-
-function TField.Obs: string;
-begin
-  Result := FObs;
-end;
-
 function TField.PrimaryKey(const Value: Boolean): IField;
 begin
   Result := Self;
@@ -137,9 +114,48 @@ begin
   Result := FPrimaryKey;
 end;
 
+function TField.NotNull(const Value: Boolean): IField;
+begin
+  Result := Self;
+  FNotNull := Value;
+end;
+
+function TField.NotNull: Boolean;
+begin
+  Result := FNotNull;
+end;
+
 function TField.Name: string;
 begin
   Result := FName;
+end;
+
+function TField.Name(const Value: string): IField;
+begin
+  Result := Self;
+  FName := trim(ReplaceStr(Value, '"', ''));
+end;
+
+function TField.CharacterSet(const Value: string): IField;
+begin
+  Result := Self;
+  FCharacterSet := Value;
+end;
+
+function TField.CharacterSet: string;
+begin
+  Result := FCharacterSet;
+end;
+
+function TField.Obs(const Value: string): IField;
+begin
+  Result := Self;
+  FObs := Value;
+end;
+
+function TField.Obs: string;
+begin
+  Result := FObs;
 end;
 
 end.

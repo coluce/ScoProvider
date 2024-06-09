@@ -41,7 +41,7 @@ begin
       .AddIntegerField(1, 'ID')
         .PrimaryKey(True)
         .Obs('My primary key');
-    LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8');
+    LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8').NotNull(True);
     LTable.Fields.AddBooleanField(3, 'ACTIVE');
 
     LProvider := TProvider.Instance
