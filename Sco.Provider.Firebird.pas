@@ -145,6 +145,29 @@ function TProviderFirebird.CreateTable(const ATable: ITable; const ADropIfExists
     Result := UpperCase(Result);
   end;
 
+  procedure FillFieldsInDataBase(const AList: TStrings);
+  var
+    LFieldName: string;
+    LList: TStrings;
+  begin
+
+    if not Assigned(AList) then
+      Exit;
+
+    AList.Clear;
+
+    LList := TStringList.Create;
+    try
+      FConnection.GetFieldNames(EmptyStr, EmptyStr, ATable.Name, EmptyStr, LList);
+      for LFieldName in LList do
+      begin
+        AList.Add(LFieldName.Replace('"', EmptyStr));
+      end;
+    finally
+      LList.Free;
+    end;
+  end;
+
 var
   LSqlScript: TStrings;
   LField: IField;
@@ -208,7 +231,7 @@ begin
 
     LFieldListInDataBase := TStringList.Create;
     try
-      FConnection.GetFieldNames(EmptyStr, EmptyStr, ATable.Name, EmptyStr, LFieldListInDataBase);
+      FillFieldsInDataBase(LFieldListInDataBase);
 
       SetLength(LFieldsToCreate, 0);
 
