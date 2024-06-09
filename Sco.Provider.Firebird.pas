@@ -198,11 +198,11 @@ begin
         end;
       end;
       LSqlScript.Add(');');
-      FConnection.ExecSQL(LSqlScript.GetText);
+      FConnection.ExecSQL(LSqlScript.Text);
 
       LSqlScript.Clear;
       LSqlScript.Add('alter table ' + ATable.Name + ' add constraint ' + UpperCase(ATable.Name) + '_PK primary key (' + LPrimaryKeyFields + ');');
-      FConnection.ExecSQL(LSqlScript.GetText);
+      FConnection.ExecSQL(LSqlScript.Text);
 
     end;
 
@@ -240,7 +240,7 @@ begin
           end;
         end;
         LSqlScript.Add(';');
-        FConnection.ExecSQL(LSqlScript.GetText);
+        FConnection.ExecSQL(LSqlScript.Text);
       end;
 
     finally
