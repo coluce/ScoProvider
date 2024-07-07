@@ -1,4 +1,4 @@
-program ProviderExample;
+program ScoProviderExample;
 
 {$APPTYPE CONSOLE}
 
