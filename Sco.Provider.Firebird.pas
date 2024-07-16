@@ -19,6 +19,7 @@ type
     FDataSet: TProviderMemTable;
     FIniFilePath: string;
     procedure LoadDatabaseParams;
+    procedure SetArrayParams(AParams: TArray<TScoParam>);
   public
 
     constructor Create;
@@ -59,9 +60,13 @@ type
     function SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
 
     function SetDataSet(var ADataSet: TProviderMemTable): IProviderDatabase;
-    function Open: IProviderDatabase;
+
+    function Open: IProviderDatabase; overload;
+    function Open(AParams: TArray<TScoParam>): IProviderDatabase; overload;
     function Execute: IProviderDatabase; overload;
+    function Execute(AParams: TArray<TScoParam>): IProviderDatabase; overload;
     function Execute(out ARowsAffected: integer): IProviderDatabase; overload;
+    function Execute(out ARowsAffected: integer; AParams: TArray<TScoParam>): IProviderDatabase; overload;
 
     function StartTransaction: IProviderDatabase;
     function InTransaction: Boolean;
@@ -656,6 +661,13 @@ begin
 //  FConnection.Params.Password := FConnectionInfo.Password;
 end;
 
+function TProviderFirebird.Open(AParams: TArray<TScoParam>): IProviderDatabase;
+begin
+  Result := Self;
+  SetArrayParams(AParams);
+  Open;
+end;
+
 function TProviderFirebird.SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
 begin
   Result := Self;
@@ -777,6 +789,88 @@ function TProviderFirebird.Rollback: IProviderDatabase;
 begin
   if FConnection.InTransaction then
     FConnection.Rollback;
+end;
+
+procedure TProviderFirebird.SetArrayParams(AParams: TArray<TScoParam>);
+var
+  LScoParam: TScoParam;
+  LFieldParam: TFDParam;
+begin
+  for LScoParam in AParams do
+  begin
+    LFieldParam := FQuery.Params.FindParam(LScoParam.Name);
+    if Assigned(LFieldParam) then
+    begin
+      case LScoParam.ParamType of
+        ftUnknown: ;
+        ftString: LFieldParam.AsString := LScoParam.Value;
+        ftSmallint: LFieldParam.AsSmallInt := LScoParam.Value;
+        ftInteger: LFieldParam.AsInteger := LScoParam.Value;
+        ftWord: LFieldParam.AsWord := LScoParam.Value;
+        ftBoolean: LFieldParam.AsBoolean := LScoParam.Value;
+        ftFloat: LFieldParam.AsFloat := LScoParam.Value;
+        ftCurrency: LFieldParam.AsCurrency := LScoParam.Value;
+        ftBCD: LFieldParam.AsBCD := LScoParam.Value;
+        ftDate: LFieldParam.AsDate := LScoParam.Value;
+        ftTime: LFieldParam.AsTime := LScoParam.Value;
+        ftDateTime: LFieldParam.AsDateTime := LScoParam.Value;
+        ftBytes: ;
+        ftVarBytes: ;
+        ftAutoInc: ;
+        ftBlob: LFieldParam.AsBlob := LScoParam.Value;
+        ftMemo: LFieldParam.AsMemo := LScoParam.Value;
+        ftGraphic: ;
+        ftFmtMemo: ;
+        ftParadoxOle: ;
+        ftDBaseOle: ;
+        ftTypedBinary: ;
+        ftCursor: ;
+        ftFixedChar: LFieldParam.AsFixedChar := LScoParam.Value;
+        ftWideString: LFieldParam.AsWideString := LScoParam.Value;
+        ftLargeint: LFieldParam.AsLargeInt := LScoParam.Value;
+        ftADT: ;
+        ftArray: ;
+        ftReference: ;
+        ftDataSet: ;
+        ftOraBlob: ;
+        ftOraClob: ;
+        ftVariant: LFieldParam.Value := LScoParam.Value;
+        ftInterface: ;
+        ftIDispatch: ;
+        ftGuid: ;
+        ftTimeStamp: ;
+        ftFMTBcd: ;
+        ftFixedWideChar: ;
+        ftWideMemo: LFieldParam.AsWideMemo := LScoParam.Value;
+        ftOraTimeStamp: ;
+        ftOraInterval: ;
+        ftLongWord: LFieldParam.AsLongword := LScoParam.Value;
+        ftShortint: LFieldParam.AsShortInt := LScoParam.Value;
+        ftByte: LFieldParam.AsByte := LScoParam.Value;
+        ftExtended: LFieldParam.AsExtended := LScoParam.Value;
+        ftConnection: ;
+        ftParams: ;
+        ftStream: ;
+        ftTimeStampOffset: ;
+        ftObject: ;
+        ftSingle: LFieldParam.AsSingle := LScoParam.Value;
+      end;
+    end;
+  end;
+end;
+
+function TProviderFirebird.Execute(out ARowsAffected: integer; AParams: TArray<TScoParam>): IProviderDatabase;
+begin
+  Result := Self;
+  SetArrayParams(AParams);
+  Execute(ARowsAffected);
+end;
+
+function TProviderFirebird.Execute(AParams: TArray<TScoParam>): IProviderDatabase;
+begin
+  Result := Self;
+  SetArrayParams(AParams);
+  Execute;
 end;
 
 end.

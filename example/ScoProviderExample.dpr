@@ -19,6 +19,7 @@ var
   LIndex: Integer;
   LStrLine: string;
   LTable: ITable;
+  LArrayParam: TArray<TScoParam>;
 begin
 
   ReportMemoryLeaksOnShutdown := True;
@@ -146,6 +147,38 @@ begin
         .SetDataset(LDataSet)
         .SetIntegerParam('ID', 3)
         .Open;
+
+      if not LDataSet.IsEmpty then
+      begin
+        LDataSet.First;
+        while not LDataSet.Eof do
+        begin
+          LStrLine := EmptyStr;
+          for LIndex := 0 to LDataSet.Fields.Count -1 do
+          begin
+            LStrLine :=
+              LStrLine + LDataSet.Fields[LIndex].FieldName + ' : ' +
+              QuotedStr(LDataSet.Fields[LIndex].AsString) + ' ';
+          end;
+          Writeln(LStrLine);
+          LDataSet.Next;
+        end;
+
+      end;
+
+      Writeln('');
+      Writeln('waiting ... filtering records by ID 2 by param array');
+
+      SetLength(LArrayParam, 1);
+      LArrayParam[0].Name := 'ID';
+      LArrayParam[0].ParamType := ftInteger;
+      LArrayParam[0].Value := 2;
+
+      LProvider
+        .Clear
+        .SetSQL('select * from TEST_TABLE where ID = :ID')
+        .SetDataset(LDataSet)
+        .Open(LArrayParam);
 
       if not LDataSet.IsEmpty then
       begin

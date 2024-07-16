@@ -16,6 +16,12 @@ type
   TProviderMemTable = class(TFDMemTable)
   end;
 
+  TScoParam = record
+    Name: string;
+    ParamType: TFieldType;
+    Value: Variant;
+  end;
+
   IField = interface
     ['{29D1BC0C-62BA-4016-A621-6219141961FA}']
 
@@ -122,9 +128,12 @@ type
     function SetCurrencyParam(const AName: string; const AValue: Currency): IProviderDatabase;
     function SetBooleanParam(const AName: string; const AValue: Boolean): IProviderDatabase;
     function SetDataset(var ADataSet: TProviderMemTable): IProviderDatabase;
-    function Open: IProviderDatabase;
+    function Open: IProviderDatabase; overload;
+    function Open(AParams: TArray<TScoParam>): IProviderDatabase; overload;
     function Execute: IProviderDatabase; overload;
+    function Execute(AParams: TArray<TScoParam>): IProviderDatabase; overload;
     function Execute(out ARowsAffected: integer): IProviderDatabase; overload;
+    function Execute(out ARowsAffected: integer; AParams: TArray<TScoParam>): IProviderDatabase; overload;
 
     function StartTransaction: IProviderDatabase;
     function InTransaction: Boolean;
