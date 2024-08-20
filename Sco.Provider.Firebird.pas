@@ -259,7 +259,7 @@ begin
         LSqlScript.Clear;
         LSqlScript.Add('alter table ' + ATable.Name);
         i := 0;
-        for LField in LFields do
+        for LField in LFieldsToCreate do
         begin
           if not LField.PrimaryKey then
           begin
