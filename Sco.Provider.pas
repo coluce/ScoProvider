@@ -7,10 +7,7 @@ uses
 
 type
 
-  TProviderQuery = class(TFDQuery)
-  end;
-
-  TProviderTable = class(TFDTable)
+  TProviderQuery = class(TFDCustomQuery)
   end;
 
   TProviderMemTable = class(TFDMemTable)
@@ -112,6 +109,8 @@ type
     function CreateTable(const ATable: ITable; const ADropIfExists: Boolean): IProviderDatabase; overload;
     function FieldExists(const ATableName, AFieldName: string): boolean;
     function TableExists(const ATableName: string): boolean;
+
+    function NewQuery: TProviderQuery;
 
     function ConnectionString: string;
 

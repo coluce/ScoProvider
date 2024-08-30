@@ -42,6 +42,8 @@ type
     function FieldExists(const ATableName, AFieldName: string): boolean;
     function TableExists(const ATableName: string): boolean;
 
+    function NewQuery: TProviderQuery;
+
     function ConnectionString: string;
 
     function Clear: IProviderDatabase;
@@ -659,6 +661,12 @@ begin
 //  FConnection.Params.Add('CharacterSet=UTF8');
 //  FConnection.Params.UserName := FConnectionInfo.UserName;
 //  FConnection.Params.Password := FConnectionInfo.Password;
+end;
+
+function TProviderFirebird.NewQuery: TProviderQuery;
+begin
+  Result := TProviderQuery.Create(FConnection);
+  Result.Connection := FConnection;
 end;
 
 function TProviderFirebird.Open(AParams: TArray<TScoParam>): IProviderDatabase;
