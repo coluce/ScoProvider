@@ -80,21 +80,36 @@ type
 
   end;
 
-  TDatabaseInfo = record
-    Server: string;
-    Port: integer;
-    FileName: string;
-    UserName: string;
-    Password: string;
-    CharacterSet: string;
-    Protocol: string;
+  IProviderDatabaseInfo = interface
+  ['{B40DDA43-91D6-4100-9617-4CE2EB09E2FC}']
+
+    function GetServer: string;
+    function GetPort: integer;
+    function GetFileName: string;
+    function GetUserName: string;
+    function GetPassword: string;
+    function GetCharacterSet: string;
+    function GetProtocol: string;
+
+    procedure SetServer(const Value: string);
+    procedure SetPort(const Value: integer);
+    procedure SetFileName(const Value: string);
+    procedure SetUserName(const Value: string);
+    procedure SetPassword(const Value: string);
+    procedure SetCharacterSet(const Value: string);
+    procedure SetProtocol(const Value: string);
+
+    property Server: string read GetServer write SetServer;
+    property Port: integer read GetPort write SetPort;
+    property FileName: string read GetFileName write SetFileName;
+    property UserName: string read GetUserName write SetUserName;
+    property Password: string read GetPassword write SetPassword;
+    property CharacterSet: string read GetCharacterSet write SetCharacterSet;
+    property Protocol: string read GetProtocol write SetProtocol;
   end;
 
   IProviderDatabase = interface
     ['{678D3DF1-4417-44EB-A88C-76D74F63B3E5}']
-
-    function SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
-    function SetDatabaseInfo(AInfo: TDatabaseInfo): IProviderDatabase;
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
@@ -134,6 +149,7 @@ type
     function Execute(out ARowsAffected: integer): IProviderDatabase; overload;
     function Execute(out ARowsAffected: integer; AParams: TArray<TScoParam>): IProviderDatabase; overload;
 
+    function DatabaseInfo: IProviderDatabaseInfo;
     function StartTransaction: IProviderDatabase;
     function InTransaction: Boolean;
     function Commit: IProviderDatabase;
@@ -141,12 +157,13 @@ type
 
   end;
 
-  TProvider = class
+  TScoProvider = class
   strict private
     class var FInstance: IProviderDatabase;
   public
     class function Firebird: IProviderDatabase;
     class function Instance: IProviderDatabase;
+    class function Info: IProviderDatabaseInfo;
   end;
 
   TStructureDomain = class
@@ -159,21 +176,24 @@ implementation
 
 uses
   Sco.Provider.Domain.Field, Sco.Provider.Domain.Table, Sco.Provider.Firebird,
-  System.SysUtils, System.Generics.Defaults;
+  System.SysUtils, System.Generics.Defaults, Sco.Provider.DatabaseInfo;
 
 { TProvider }
 
-class function TProvider.Firebird: IProviderDatabase;
+class function TScoProvider.Firebird: IProviderDatabase;
 begin
   Result := TProviderFirebird.Create;
 end;
 
-class function TProvider.Instance: IProviderDatabase;
+class function TScoProvider.Info: IProviderDatabaseInfo;
+begin
+  Result := TProviderDatabaseInfo.New;
+end;
+
+class function TScoProvider.Instance: IProviderDatabase;
 begin
   if not Assigned(FInstance) then
-  begin
     FInstance := TProviderFirebird.Create;
-  end;
   Result := FInstance;
 end;
 

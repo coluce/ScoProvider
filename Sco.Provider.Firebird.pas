@@ -13,20 +13,19 @@ type
   TProviderFirebird = class(TInterfacedObject, IProviderDatabase)
   private
     FConnection: TFDConnection;
-    FConnectionInfo: TDatabaseInfo;
+    FDatabaseInfo: IProviderDatabaseInfo;
     // mais facil usar o FDQuery do que ter um obj de SQL e um de Param separados
     FQuery: TFDQuery;
     FDataSet: TProviderMemTable;
     FIniFilePath: string;
-    procedure LoadDatabaseParams;
+    procedure DoBeforeConnect(Sender: TObject);
     procedure SetArrayParams(AParams: TArray<TScoParam>);
   public
 
     constructor Create;
     destructor Destroy; override;
 
-    function SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
-    function SetDatabaseInfo(AInfo: TDatabaseInfo): IProviderDatabase;
+    function DatabaseInfo: IProviderDatabaseInfo;
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
@@ -107,11 +106,12 @@ begin
   FIniFilePath := ChangeFileExt(ParamStr(0), '.conf');
 
   FConnection := TFDConnection.Create(nil);
+  FConnection.BeforeConnect := DoBeforeConnect;
 
   FQuery := TFDQuery.Create(FConnection);
   FQuery.Connection := FConnection;
 
-  LoadDatabaseParams;
+  FDatabaseInfo := TScoProvider.Info;
 end;
 
 function TProviderFirebird.CreateTable(const ATable: ITable): IProviderDatabase;
@@ -588,63 +588,47 @@ begin
   end;
 end;
 
-procedure TProviderFirebird.LoadDatabaseParams;
+procedure TProviderFirebird.DoBeforeConnect(Sender: TObject);
 var
-  LIniFile: TIniFile;
   LConnectionString: string;
 begin
 
-  if not FIniFilePath.Trim.IsEmpty then
-  begin
-    LIniFile := TIniFile.Create(FIniFilepath);
-    try
-      FConnectionInfo.Server := LIniFile.ReadString( 'database', 'server', '127.0.0.1' );
-      FConnectionInfo.Port := LIniFile.ReadInteger('database', 'port', 3050);
-      FConnectionInfo.FileName := LIniFile.ReadString( 'database', 'name', '');
-      FConnectionInfo.CharacterSet := LIniFile.ReadString( 'database', 'charset', 'UTF8');
-      FConnectionInfo.Protocol := LIniFile.ReadString( 'database', 'protocol', 'TCPIP');
-      FConnectionInfo.UserName := LIniFile.ReadString( 'database', 'username', 'sysdba');
-      FConnectionInfo.Password := LIniFile.ReadString( 'database', 'password', 'masterkey');
-    finally
-      LIniFile.Free;
-    end;
-  end;
+  if FDatabaseInfo.Server.Trim.IsEmpty then
+    FDatabaseInfo.Server := '127.0.0.1';
 
-  if FConnectionInfo.Server.Trim.IsEmpty then
-    FConnectionInfo.Server := '127.0.0.1';
+  if FDatabaseInfo.Port < 1 then
+    FDatabaseInfo.Port := 3050;
 
-  if FConnectionInfo.Port < 1 then
-    FConnectionInfo.Port := 3050;
+  if FDatabaseInfo.FileName.Trim.IsEmpty then
+    FDatabaseInfo.FileName := ChangeFileExt(ParamStr(0), '.fdb');
 
-  if FConnectionInfo.FileName.Trim.IsEmpty then
-    FConnectionInfo.FileName := ChangeFileExt(ParamStr(0), '.fdb');
+  if FDatabaseInfo.CharacterSet.Trim.IsEmpty then
+    FDatabaseInfo.CharacterSet := 'UTF8';
 
-  if FConnectionInfo.CharacterSet.Trim.IsEmpty then
-    FConnectionInfo.CharacterSet := 'UTF8';
+  if FDatabaseInfo.Protocol.Trim.IsEmpty then
+    FDatabaseInfo.Protocol := 'TCPIP';
 
-  if FConnectionInfo.Protocol.Trim.IsEmpty then
-    FConnectionInfo.Protocol := 'TCPIP';
+  if FDatabaseInfo.UserName.Trim.IsEmpty then
+    FDatabaseInfo.UserName := 'SYSDBA';
 
-  if FConnectionInfo.UserName.Trim.IsEmpty then
-    FConnectionInfo.UserName := 'SYSDBA';
-
-  if FConnectionInfo.Password.Trim.IsEmpty then
-    FConnectionInfo.Password := 'masterkey';
+  if FDatabaseInfo.Password.Trim.IsEmpty then
+    FDatabaseInfo.Password := 'masterkey';
 
   LConnectionString :=
-     'Database=' + FConnectionInfo.FileName + ';' +
-     'User_Name=' + FConnectionInfo.UserName + ';' +
-     'Password=' + FConnectionInfo.Password + ';' +
-     'Server=' + FConnectionInfo.Server + ';' +
-     'Port=' + FConnectionInfo.Port.ToString + ';' +
-     'Protocol=' + FConnectionInfo.Protocol + ';' +
-     'CharacterSet=' + FConnectionInfo.CharacterSet + ';' +
+     'Database=' + FDatabaseInfo.FileName + ';' +
+     'User_Name=' + FDatabaseInfo.UserName + ';' +
+     'Password=' + FDatabaseInfo.Password + ';' +
+     'Server=' + FDatabaseInfo.Server + ';' +
+     'Port=' + FDatabaseInfo.Port.ToString + ';' +
+     'Protocol=' + FDatabaseInfo.Protocol + ';' +
+     'CharacterSet=' + FDatabaseInfo.CharacterSet + ';' +
      'DriverID=FB';
 
   if FConnection.Connected then
     FConnection.Close;
 
   FConnection.ConnectionString := LConnectionString;
+//  FConnection.Params.Values['CreateDatabase'] := BoolToStr(True, True);
 
 //  var LDataBasePath: string;
 
@@ -688,12 +672,9 @@ begin
   FQuery.ParamByName(AName).AsCurrency := AValue;
 end;
 
-function TProviderFirebird.SetDatabaseInfo(AInfo: TDatabaseInfo): IProviderDatabase;
+function TProviderFirebird.DatabaseInfo: IProviderDatabaseInfo;
 begin
-  Result := Self;
-  FConnectionInfo := AInfo;
-  FIniFilePath := '';
-  LoadDatabaseParams;
+  Result := FDatabaseInfo;
 end;
 
 function TProviderFirebird.SetDataset(var ADataSet: TProviderMemTable): IProviderDatabase;
@@ -718,13 +699,6 @@ function TProviderFirebird.SetFloatParam(const AName: string; const AValue: Doub
 begin
   Result := Self;
   FQuery.ParamByName(AName).AsFloat := AValue;
-end;
-
-function TProviderFirebird.SetIniFilePath(const AIniFilePath: string): IProviderDatabase;
-begin
-  Result := Self;
-  FIniFilePath := AIniFilePath;
-  LoadDatabaseParams;
 end;
 
 function TProviderFirebird.SetIntegerParam(const AName: string; const AValue: integer): IProviderDatabase;

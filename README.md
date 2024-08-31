@@ -1,7 +1,7 @@
 ## ⚙️ Installation
 Installation is done using the [`boss install`](https://github.com/HashLoad/boss) command:
 ``` sh
-boss install github.com/coluce/provider
+boss install github.com/coluce/scoprovider
 ```
 
 ## ℹ️ Defining the connection data
@@ -9,18 +9,17 @@ boss install github.com/coluce/provider
 uses 
   Sco.Provider;
 var
-  LProvider: IProviderDatabase;
-  LDatabaseInfo: TDatabaseInfo;
+  LDatabase: IProviderDatabase;
 begin
 
-  LDatabaseInfo.Server := 'localhost';
-  LDatabaseInfo.Port := 3050;
-  LDatabaseInfo.FileName := 'my_firebird_database.fdb';
-  LDatabaseInfo.UserName := 'SYSDBA';
-  LDatabaseInfo.Password := 'my_secret_password';
-
-  LProvider := TProvider.Instance
-    .SetDatabaseInfo(LDatabaseInfo);
+  LDatabase := TScoProvider.Instance;
+  LDatabase.DatabaseInfo.Server := 'localhost';
+  LDatabase.DatabaseInfo.Port := 3050;
+  LDatabase.DatabaseInfo.FileName := 'sco_provider';
+  LDatabase.DatabaseInfo.Protocol := 'TCPIP';
+  LDatabase.DatabaseInfo.CharacterSet := 'UTF8';
+  LDatabase.DatabaseInfo.UserName := 'SYSDBA';
+  LDatabase.DatabaseInfo.Password := 'masterkey';
 
 end;
 ```
@@ -45,7 +44,7 @@ begin
   LTable.Fields.AddBooleanField(3, 'ACTIVE');
 
   { create table in database }
-  LProvider.CreateTable(LTable, True);
+  LDatabase.CreateTable(LTable, True);
 
 end;
 ```
@@ -61,13 +60,13 @@ var
 begin
 
   LStrLine := 'insert into ' + LTable.Name + ' (ID, Name) values (1, ' + QuotedStr('My Name') + ')';
-  LProvider
+  LDatabase
     .Clear
     .SetSQL(LStrLine)
     .Execute;
 
   LStrLine := 'insert into ' + LTable.Name + ' (ID, Name) values (2, ' + QuotedStr('Your Name') + ')';
-  LProvider
+  LDatabase
     .Clear
     .SetSQL(LStrLine)
     .Execute;
@@ -76,7 +75,7 @@ begin
   LDataSet := TProviderMemTable.Create(nil);
   try
 
-    LProvider
+    LDatabase
     .Clear
     .SetSQL('select * from ' + LTable.Name)
     .SetDataset(LDataSet)

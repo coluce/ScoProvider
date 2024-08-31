@@ -10,11 +10,11 @@ uses
   Sco.Provider.Firebird in '..\Sco.Provider.Firebird.pas',
   Sco.Provider in '..\Sco.Provider.pas',
   Sco.Provider.Domain.Field in '..\Sco.Provider.Domain.Field.pas',
-  Sco.Provider.Domain.Table in '..\Sco.Provider.Domain.Table.pas';
+  Sco.Provider.Domain.Table in '..\Sco.Provider.Domain.Table.pas',
+  Sco.Provider.DatabaseInfo in '..\Sco.Provider.DatabaseInfo.pas';
 
 var
-  LDatabaseInfo: TDatabaseInfo;
-  LProvider: IProviderDatabase;
+  LDatabase: IProviderDatabase;
   LDataSet: TProviderMemTable;
   LIndex: Integer;
   LStrLine: string;
@@ -24,16 +24,8 @@ begin
 
   ReportMemoryLeaksOnShutdown := True;
 
-  Writeln('Provider - Example');
+  Writeln('ScoProvider - Example');
   try
-
-    LDatabaseInfo.Server := 'localhost';
-    LDatabaseInfo.Port := 3051;
-    LDatabaseInfo.FileName := 'deathstar.fdb';
-    LDatabaseInfo.Protocol := 'TCPIP';
-    LDatabaseInfo.CharacterSet := 'UTF8';
-    LDatabaseInfo.UserName := 'SYSDBA';
-    LDatabaseInfo.Password := '1709d7c5c7eb4f910115';
 
     LTable := TStructureDomain.Table;
     LTable.Name('TEST_TABLE');
@@ -44,15 +36,21 @@ begin
     LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8').NotNull(True);
     LTable.Fields.AddBooleanField(3, 'ACTIVE');
 
-    LProvider := TProvider.Instance
-      .SetDatabaseInfo(LDatabaseInfo);
+    LDatabase := TScoProvider.Instance;
+    LDatabase.DatabaseInfo.Server := 'localhost';
+    LDatabase.DatabaseInfo.Port := 3050;
+    LDatabase.DatabaseInfo.FileName := 'sco_provider';
+    LDatabase.DatabaseInfo.Protocol := 'TCPIP';
+    LDatabase.DatabaseInfo.CharacterSet := 'UTF8';
+    LDatabase.DatabaseInfo.UserName := 'SYSDBA';
+    LDatabase.DatabaseInfo.Password := 'masterkey';
 
     Writeln('');
-    Writeln('Database: ' + LDatabaseInfo.FileName);
+    Writeln('Database: ' + LDatabase.DatabaseInfo.FileName);
     Writeln('');
 
     Writeln('waiting ... creating table');
-    LProvider.CreateTable(LTable, True);
+    LDatabase.CreateTable(LTable, True);
 
     Writeln('');
     Writeln('waiting ... creating records');
@@ -60,7 +58,7 @@ begin
     LStrLine := 'insert into TEST_TABLE (ID, NAME, ACTIVE) values (:ID, :NAME, :ACTIVE)';
     Writeln('script: ' + LStrLine);
 
-    LProvider
+    LDatabase
       .Clear
       .SetSQL(LStrLine)
       .SetIntegerParam('ID', 1)
@@ -68,13 +66,13 @@ begin
       .SetBooleanParam('ACTIVE', True)
       .Execute;
 
-    LProvider
+    LDatabase
       .SetIntegerParam('ID', 2)
       .SetStringParam('NAME', 'Your Name')
       .SetBooleanParam('ACTIVE', True)
       .Execute;
 
-    LProvider
+    LDatabase
       .SetIntegerParam('ID', 3)
       .SetStringParam('NAME', 'Nobody')
       .SetBooleanParam('ACTIVE', False)
@@ -86,7 +84,7 @@ begin
     LDataSet := TProviderMemTable.Create(nil);
     try
 
-      LProvider
+      LDatabase
         .Clear
         .SetSQL('select * from TEST_TABLE where ACTIVE')
         .SetDataset(LDataSet)
@@ -113,7 +111,7 @@ begin
       Writeln('');
       Writeln('waiting ... filtering records by ID 2');
 
-      LProvider
+      LDatabase
         .Clear
         .SetSQL('select * from TEST_TABLE where ID = :ID')
         .SetDataset(LDataSet)
@@ -141,7 +139,7 @@ begin
       Writeln('');
       Writeln('waiting ... filtering records by ID 3');
 
-      LProvider
+      LDatabase
         .Clear
         .SetSQL('select * from TEST_TABLE where ID = :ID')
         .SetDataset(LDataSet)
@@ -174,7 +172,7 @@ begin
       LArrayParam[0].ParamType := ftInteger;
       LArrayParam[0].Value := 2;
 
-      LProvider
+      LDatabase
         .Clear
         .SetSQL('select * from TEST_TABLE where ID = :ID')
         .SetDataset(LDataSet)
