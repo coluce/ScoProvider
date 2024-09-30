@@ -199,6 +199,7 @@ type
   TStructureDomain = class
   public
     class function Table: ITable;
+    class function ForeignKey: ITableForeignKey;
     class function Field: IField;
   end;
 
@@ -237,6 +238,11 @@ end;
 class function TStructureDomain.Table: ITable;
 begin
   Result := TTable.New;
+end;
+
+class function TStructureDomain.ForeignKey: ITableForeignKey;
+begin
+  Result := TTableForeignKey.New;
 end;
 
 { TTableField }
