@@ -175,6 +175,42 @@ function TProviderFirebird.CreateTable(const ATable: ITable; const ADropIfExists
     end;
   end;
 
+  procedure ForeignKeys;
+  var
+    LSqlScript: TStrings;
+    LForeignKey: ITableForeignKey;
+  begin
+
+    if ATable.ForeignKeys.Count < 1 then
+      Exit;
+
+    LSqlScript := TStringList.Create;
+    try
+      for LForeignKey in ATable.ForeignKeys.Values do
+      begin
+        LSqlScript.Clear;
+        LSqlScript.Add('alter table ' + UpperCase(ATable.Name) + ' add constraint ' + UpperCase(LForeignKey.Name));
+        LSqlScript.Add('  foreign key (' + UpperCase(LForeignKey.Keys) + ')');
+        LSqlScript.Add('  references ' + UpperCase(LForeignKey.RefrenceTable) + ' (' + UpperCase(LForeignKey.RefrenceKeys) + ')');
+
+        case LForeignKey.OnDelete of
+          Cascade: LSqlScript.Add('  on delete cascade;');
+          SetNull: LSqlScript.Add('  on delete set null;');
+          Restrict: LSqlScript.Add('  on delete restrict;');
+        end;
+
+        case LForeignKey.OnUpdate of
+          Cascade: LSqlScript.Add('  on update cascade;');
+          SetNull: LSqlScript.Add('  on update set null;');
+          Restrict: LSqlScript.Add('  on update restrict;');
+        end;
+        FConnection.ExecSQL(LSqlScript.Text);
+      end;
+    finally
+      LSqlScript.Free;
+    end;
+  end;
+
 var
   LSqlScript: TStrings;
   LField: IField;
@@ -192,12 +228,8 @@ begin
     raise Exception.Create('No Primary Key for Table "' + ATable.Name + '".');
 
   if ADropIfExists then
-  begin
     if TableExists(ATable.Name) then
-    begin
       FConnection.ExecSQL('drop table ' + ATable.Name);
-    end;
-  end;
 
   LSqlScript := TStringList.Create;
   try
@@ -276,6 +308,8 @@ begin
     finally
       LFieldListInDataBase.Free;
     end;
+
+    ForeignKeys;
 
   finally
     LSqlScript.Free;

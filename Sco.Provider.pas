@@ -48,6 +48,36 @@ type
 
   end;
 
+  TTableForeignKeyType = (None, Cascade, SetNull, Restrict);
+
+  ITableForeignKey = interface
+    ['{BF1A027F-F51F-4593-AAA2-EED3E2166027}']
+
+    function Name: string; overload;
+    function Name(const Value: string): ITableForeignKey; overload;
+
+    function Keys: string; overload;
+    function Keys(const Value: string): ITableForeignKey; overload;
+
+    function RefrenceTable: string; overload;
+    function ReferenceTable(const Value: string): ITableForeignKey; overload;
+
+    function RefrenceKeys: string; overload;
+    function ReferenceKeys(const Value: string): ITableForeignKey; overload;
+
+    function OnDelete: TTableForeignKeyType; overload;
+    function OnDelete(const Value: TTableForeignKeyType): ITableForeignKey; overload;
+
+    function OnUpdate: TTableForeignKeyType; overload;
+    function OnUpdate(const Value: TTableForeignKeyType): ITableForeignKey; overload;
+
+  end;
+
+  TTableForeignKeys = class(TDictionary<string, ITableForeignKey>)
+  public
+    procedure AddReference(const AReference: ITableForeignKey);
+  end;
+
   TTableFields = class(TDictionary<string, IField>)
   public
     function PrimaryKeys: TArray<IField>;
@@ -74,6 +104,7 @@ type
     function Name(const Value: string): ITable; overload;
 
     function Fields: TTableFields;
+    function ForeignKeys: TTableForeignKeys;
 
     function Obs: string; overload;
     function Obs(const Value: string): ITable; overload;
@@ -81,8 +112,7 @@ type
   end;
 
   IProviderDatabaseInfo = interface
-  ['{B40DDA43-91D6-4100-9617-4CE2EB09E2FC}']
-
+    ['{B40DDA43-91D6-4100-9617-4CE2EB09E2FC}']
     function GetServer: string;
     function GetPort: integer;
     function GetFileName: string;
@@ -349,6 +379,13 @@ begin
       Result[Length(Result) - 1] := LField;
     end;
   end;
+end;
+
+{ TTableForeignKeys }
+
+procedure TTableForeignKeys.AddReference(const AReference: ITableForeignKey);
+begin
+  Self.AddOrSetValue(AReference.Name, AReference);
 end;
 
 end.

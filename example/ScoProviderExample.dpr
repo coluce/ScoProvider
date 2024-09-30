@@ -19,6 +19,7 @@ var
   LIndex: Integer;
   LStrLine: string;
   LTable: ITable;
+  LReference: ITableForeignKey;
   LArrayParam: TArray<TScoParam>;
 begin
 
@@ -26,15 +27,6 @@ begin
 
   Writeln('ScoProvider - Example');
   try
-
-    LTable := TStructureDomain.Table;
-    LTable.Name('TEST_TABLE');
-    LTable.Fields
-      .AddIntegerField(1, 'ID')
-        .PrimaryKey(True)
-        .Obs('My primary key');
-    LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8').NotNull(True);
-    LTable.Fields.AddBooleanField(3, 'ACTIVE');
 
     LDatabase := TScoProvider.Instance;
     LDatabase.DatabaseInfo.Server := 'localhost';
@@ -49,13 +41,37 @@ begin
     Writeln('Database: ' + LDatabase.DatabaseInfo.FileName);
     Writeln('');
 
-    Writeln('waiting ... creating table');
+    LTable := TStructureDomain.Table;
+    LTable.Name('MASTER_TABLE');
+    LTable.Fields.AddIntegerField(1, 'ID').PrimaryKey(True).Obs('My primary key');
+    LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8').NotNull(True);
+    LTable.Fields.AddBooleanField(3, 'ACTIVE');
+
+    Writeln('waiting ... creating master table');
+    LDatabase.CreateTable(LTable, True);
+
+    LTable := TStructureDomain.Table;
+    LTable.Name('DETAIL_TABLE');
+    LTable.Fields.AddIntegerField(1, 'ID').PrimaryKey(True);
+    LTable.Fields.AddIntegerField(1, 'ID_OWNER').NotNull(True);
+    LTable.Fields.AddStringField(2, 'NAME', 100, 'UTF8');
+
+    LReference := TTableForeignKey.New
+      .Name('MASTER_DETAIL_FK')
+      .Keys('ID_OWNER')
+      .ReferenceTable('MASTER_TABLE')
+      .ReferenceKeys('ID')
+      .OnDelete(TTableForeignKeyType.Cascade);
+
+    LTable.ForeignKeys.AddReference(LReference);
+
+    Writeln('waiting ... creating detail table');
     LDatabase.CreateTable(LTable, True);
 
     Writeln('');
     Writeln('waiting ... creating records');
 
-    LStrLine := 'insert into TEST_TABLE (ID, NAME, ACTIVE) values (:ID, :NAME, :ACTIVE)';
+    LStrLine := 'insert into MASTER_TABLE (ID, NAME, ACTIVE) values (:ID, :NAME, :ACTIVE)';
     Writeln('script: ' + LStrLine);
 
     LDatabase
@@ -86,7 +102,7 @@ begin
 
       LDatabase
         .Clear
-        .SetSQL('select * from TEST_TABLE where ACTIVE')
+        .SetSQL('select * from MASTER_TABLE where ACTIVE')
         .SetDataset(LDataSet)
         .Open;
 
@@ -113,7 +129,7 @@ begin
 
       LDatabase
         .Clear
-        .SetSQL('select * from TEST_TABLE where ID = :ID')
+        .SetSQL('select * from MASTER_TABLE where ID = :ID')
         .SetDataset(LDataSet)
         .SetIntegerParam('ID', 2)
         .Open;
@@ -141,7 +157,7 @@ begin
 
       LDatabase
         .Clear
-        .SetSQL('select * from TEST_TABLE where ID = :ID')
+        .SetSQL('select * from MASTER_TABLE where ID = :ID')
         .SetDataset(LDataSet)
         .SetIntegerParam('ID', 3)
         .Open;
@@ -174,7 +190,7 @@ begin
 
       LDatabase
         .Clear
-        .SetSQL('select * from TEST_TABLE where ID = :ID')
+        .SetSQL('select * from MASTER_TABLE where ID = :ID')
         .SetDataset(LDataSet)
         .Open(LArrayParam);
 
