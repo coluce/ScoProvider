@@ -19,6 +19,7 @@ var
   LIndex: Integer;
   LStrLine: string;
   LTable: ITable;
+  LField: IField;
   LReference: ITableForeignKey;
   LArrayParam: TArray<TScoParam>;
 begin
@@ -40,6 +41,9 @@ begin
     Writeln('');
     Writeln('Database: ' + LDatabase.DatabaseInfo.FileName);
     Writeln('');
+
+    LDatabase.Clear.SetSQL('drop table DETAIL_TABLE').Execute;
+    LDatabase.Clear.SetSQL('drop table MASTER_TABLE').Execute;
 
     LTable := TStructureDomain.Table;
     LTable.Name('MASTER_TABLE');
@@ -215,6 +219,15 @@ begin
     finally
       LDataSet.Free;
     end;
+
+    Writeln('');
+    Writeln('List Table Fields');
+    Writeln('---');
+    Writeln('|FieldName|PK|NotNull|');
+    Writeln('|---|---|---|');
+    LDatabase.FillFields(LTable);
+    for LField in LTable.Fields.OrderedByIndex do
+      Writeln(Format('|%s|%s|%s|', [LField.Name, LField.PrimaryKey.ToString, LField.NotNull.ToString]));
 
     Writeln('');
     Writeln('Done!');

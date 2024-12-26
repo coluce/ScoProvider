@@ -362,6 +362,7 @@ end;
 
 function TProviderFirebird.FillFields(const ATable: ITable): IProviderDatabase;
 var
+  LQuery: TFDQuery;
   LMetaInfoQuery: TFDMetaInfoQuery;
   LField: IField;
 begin
@@ -377,6 +378,7 @@ begin
     LMetaInfoQuery.ObjectName := ATable.Name;
     LMetaInfoQuery.Open;
 
+    { buscar informações de todos os campos }
     if not LMetaInfoQuery.IsEmpty then
     begin
       while not LMetaInfoQuery.Eof do
@@ -384,6 +386,7 @@ begin
         LField := TStructureDomain.Field
           .Index(LMetaInfoQuery.FieldByName('COLUMN_POSITION').AsInteger)
           .PrimaryKey(False)
+          .NotNull(False)
           .Name(LMetaInfoQuery.FieldByName('COLUMN_NAME').AsString)
           .FieldType(LMetaInfoQuery.FieldByName('COLUMN_TYPENAME').AsString)
           .FieldSize(LMetaInfoQuery.FieldByName('COLUMN_LENGTH').AsInteger);
@@ -394,6 +397,7 @@ begin
       end;
     end;
 
+    { complementar informação dos campos que são chaves primarias }
     LMetaInfoQuery.Close;
     LMetaInfoQuery.MetaInfoKind := mkPrimaryKeyFields;
     LMetaInfoQuery.BaseObjectName := ATable.Name;
@@ -409,6 +413,36 @@ begin
         end;
         LMetaInfoQuery.Next;
       end;
+    end;
+
+    { complementar informação dos campos que são notnull }
+    LQuery := TFDQuery.Create(FConnection);
+    try
+      LQuery.Connection := FConnection;
+      LQuery.SQL.Add('select');
+      LQuery.SQL.Add('  TABLE_FIELDS.RDB$FIELD_NAME as COLUMN_NAME');
+      LQuery.SQL.Add('from');
+      LQuery.SQL.Add('  RDB$RELATION_FIELDS as TABLE_FIELDS');
+      LQuery.SQL.Add('where');
+      LQuery.SQL.Add('  TABLE_FIELDS.RDB$RELATION_NAME = :TABLE_NAME and');
+      LQuery.SQL.Add('  coalesce(TABLE_FIELDS.RDB$NULL_FLAG, 0) = 1');
+      LQuery.ParamByName('TABLE_NAME').AsString := ATable.Name;
+      LQuery.Open;
+
+      if not LQuery.IsEmpty then
+      begin
+        LQuery.First;
+        while not LQuery.Eof do
+        begin
+          if ATable.Fields.TryGetValue(LQuery.FieldByName('COLUMN_NAME').AsString, LField) then
+            LField.NotNull(True);
+          LQuery.Next;
+        end;
+
+      end;
+
+    finally
+      LQuery.Free;
     end;
 
   finally
