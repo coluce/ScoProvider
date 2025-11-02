@@ -192,6 +192,7 @@ type
     class var FInstance: IProviderDatabase;
   public
     class function Firebird: IProviderDatabase;
+    class function SQLite: IProviderDatabase;
     class function Instance: IProviderDatabase;
     class function Info: IProviderDatabaseInfo;
   end;
@@ -207,13 +208,19 @@ implementation
 
 uses
   Sco.Provider.Domain.Field, Sco.Provider.Domain.Table, Sco.Provider.Firebird,
-  System.SysUtils, System.Generics.Defaults, Sco.Provider.DatabaseInfo;
+  Sco.Provider.SQLite, System.SysUtils, System.Generics.Defaults, 
+  Sco.Provider.DatabaseInfo;
 
 { TProvider }
 
 class function TScoProvider.Firebird: IProviderDatabase;
 begin
   Result := TProviderFirebird.Create;
+end;
+
+class function TScoProvider.SQLite: IProviderDatabase;
+begin
+  Result := TProviderSQLite.Create;
 end;
 
 class function TScoProvider.Info: IProviderDatabaseInfo;

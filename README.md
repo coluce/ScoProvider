@@ -4,15 +4,18 @@ Installation is done using the [`boss install`](https://github.com/HashLoad/boss
 boss install github.com/coluce/scoprovider
 ```
 
-## ℹ️ Defining the connection data
+## 🗄️ Supported Databases
+
+ScoProvider supports multiple database engines:
+
+### Firebird
 ```delphi
 uses 
   Sco.Provider;
 var
   LDatabase: IProviderDatabase;
 begin
-
-  LDatabase := TScoProvider.Instance;
+  LDatabase := TScoProvider.Firebird;
   LDatabase.DatabaseInfo.Server := 'localhost';
   LDatabase.DatabaseInfo.Port := 3050;
   LDatabase.DatabaseInfo.FileName := 'sco_provider';
@@ -20,8 +23,26 @@ begin
   LDatabase.DatabaseInfo.CharacterSet := 'UTF8';
   LDatabase.DatabaseInfo.UserName := 'SYSDBA';
   LDatabase.DatabaseInfo.Password := 'masterkey';
-
 end;
+```
+
+### SQLite
+```delphi
+uses 
+  Sco.Provider;
+var
+  LDatabase: IProviderDatabase;
+begin
+  LDatabase := TScoProvider.SQLite;
+  LDatabase.DatabaseInfo.FileName := 'C:\MyProject\database.db';
+  // SQLite only needs the file path
+end;
+```
+
+## ℹ️ Legacy Usage (Firebird only)
+```delphi
+// For backward compatibility - uses Firebird by default
+LDatabase := TScoProvider.Instance;
 ```
 
 ## 🆕 Creating a table
@@ -103,5 +124,15 @@ begin
 end;
 ```
 
-## 📚 Delphi Versions
+## � Database-Specific Features
+
+### SQLite Limitations
+- **Sequences**: Not supported. Use `AUTOINCREMENT` with `INTEGER PRIMARY KEY` instead
+- **Character Sets**: Ignored (SQLite always uses UTF-8)
+- **ALTER TABLE**: Limited support for adding columns to existing tables
+- **Foreign Keys**: Can only be added during table creation
+
+See [README_SQLite.md](README_SQLite.md) for detailed SQLite documentation.
+
+## �📚 Delphi Versions
 `Provider` works with Delphi 12, Delphi 11 Alexandria, Delphi 10.4 Sydney, Delphi 10.3 Rio, Delphi 10.2 Tokyo, Delphi 10.1 Berlin, Delphi 10 Seattle, Delphi XE8 and Delphi XE7.
