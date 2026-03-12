@@ -11,7 +11,8 @@ uses
   Sco.Provider in '..\Sco.Provider.pas',
   Sco.Provider.Domain.Field in '..\Sco.Provider.Domain.Field.pas',
   Sco.Provider.Domain.Table in '..\Sco.Provider.Domain.Table.pas',
-  Sco.Provider.DatabaseInfo in '..\Sco.Provider.DatabaseInfo.pas';
+  Sco.Provider.DatabaseInfo in '..\Sco.Provider.DatabaseInfo.pas',
+  Sco.Provider.SQLite in '..\Sco.Provider.SQLite.pas';
 
 var
   LDatabase: IProviderDatabase;
@@ -29,10 +30,10 @@ begin
   Writeln('ScoProvider - Example');
   try
 
-    LDatabase := TScoProvider.Instance;
+    LDatabase := TScoProvider.SQLite;
     LDatabase.DatabaseInfo.Server := 'localhost';
     LDatabase.DatabaseInfo.Port := 3050;
-    LDatabase.DatabaseInfo.FileName := 'sco_provider';
+    LDatabase.DatabaseInfo.FileName := 'sco_provider.db';
     LDatabase.DatabaseInfo.Protocol := 'TCPIP';
     LDatabase.DatabaseInfo.CharacterSet := 'UTF8';
     LDatabase.DatabaseInfo.UserName := 'SYSDBA';
@@ -42,8 +43,10 @@ begin
     Writeln('Database: ' + LDatabase.DatabaseInfo.FileName);
     Writeln('');
 
-    LDatabase.Clear.SetSQL('drop table DETAIL_TABLE').Execute;
-    LDatabase.Clear.SetSQL('drop table MASTER_TABLE').Execute;
+    if LDatabase.TableExists('DETAIL_TABLE') then
+      LDatabase.Clear.SetSQL('drop table DETAIL_TABLE').Execute;
+    if LDatabase.TableExists('MASTER_TABLE') then
+      LDatabase.Clear.SetSQL('drop table MASTER_TABLE').Execute;
 
     LTable := TStructureDomain.Table;
     LTable.Name('MASTER_TABLE');

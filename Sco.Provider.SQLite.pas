@@ -25,6 +25,7 @@ type
     destructor Destroy; override;
 
     function DatabaseInfo: IProviderDatabaseInfo;
+    function DatabaseType: TDatabaseType;
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
     function FillFieldNames(const ATableName: string; AList: TStrings): IProviderDatabase;
@@ -314,16 +315,31 @@ begin
 end;
 
 procedure TProviderSQLite.DoBeforeConnect(Sender: TObject);
+
+  procedure SetDatabaseExtension;
+  begin
+    case Self.DatabaseType of
+      Firebird: FDatabaseInfo.FileName := FDatabaseInfo.FileName.Trim + '.fdb';
+      SQLite: FDatabaseInfo.FileName := FDatabaseInfo.FileName.Trim + '.db';
+    end;
+  end;
+
 var
   LConnectionString: string;
   LDatabasePath: string;
+  LDatabaseExtension: string;
 begin
   if FDatabaseInfo.FileName.Trim.IsEmpty then
-    FDatabaseInfo.FileName := ChangeFileExt(ParamStr(0), '.db');
+    SetDatabaseExtension;
+
+  LDatabaseExtension := ExtractFileExt(FDatabaseInfo.FileName);
+  if LDatabaseExtension.Trim.IsEmpty then
+    SetDatabaseExtension;
 
   LDatabasePath := ExtractFilePath(FDatabaseInfo.FileName);
-  if not DirectoryExists(LDatabasePath) then
-    ForceDirectories(LDatabasePath);
+  if not LDatabasePath.Trim.IsEmpty then
+    if not DirectoryExists(LDatabasePath) then
+      ForceDirectories(LDatabasePath);
 
   LConnectionString :=
      'Database=' + FDatabaseInfo.FileName + ';' +
@@ -706,6 +722,11 @@ end;
 function TProviderSQLite.DatabaseInfo: IProviderDatabaseInfo;
 begin
   Result := FDatabaseInfo;
+end;
+
+function TProviderSQLite.DatabaseType: TDatabaseType;
+begin
+  Result := TDatabaseType.SQLite;
 end;
 
 function TProviderSQLite.NewQuery: TProviderQuery;

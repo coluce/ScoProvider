@@ -1,7 +1,7 @@
 {
 	"name": "Sco Provider Database",
 	"description": "Provedor de acesso ao banco de dados",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"homepage": "https://coluce.wordpress.com/",
 	"mainsrc": "./",
 	"projects": [],

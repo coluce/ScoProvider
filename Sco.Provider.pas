@@ -7,6 +7,8 @@ uses
 
 type
 
+  TDatabaseType = (Firebird, SQLite);
+
   TProviderQuery = class(TFDCustomQuery)
   end;
 
@@ -158,6 +160,7 @@ type
     function NewQuery: TProviderQuery;
 
     function ConnectionString: string;
+    function DatabaseType: TDatabaseType;
 
     function Clear: IProviderDatabase;
     function SetSQL(const ASql: string): IProviderDatabase; overload;

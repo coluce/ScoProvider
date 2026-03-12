@@ -25,6 +25,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    function DatabaseType: TDatabaseType;
     function DatabaseInfo: IProviderDatabaseInfo;
 
     function FillTableNames(const AList: TStrings): IProviderDatabase;
@@ -743,6 +744,11 @@ end;
 function TProviderFirebird.DatabaseInfo: IProviderDatabaseInfo;
 begin
   Result := FDatabaseInfo;
+end;
+
+function TProviderFirebird.DatabaseType: TDatabaseType;
+begin
+  Result := TDatabaseType.Firebird;
 end;
 
 function TProviderFirebird.SetDataset(var ADataSet: TProviderMemTable): IProviderDatabase;

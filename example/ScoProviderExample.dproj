@@ -112,6 +112,7 @@
         <DCCReference Include="..\Sco.Provider.Domain.Field.pas"/>
         <DCCReference Include="..\Sco.Provider.Domain.Table.pas"/>
         <DCCReference Include="..\Sco.Provider.DatabaseInfo.pas"/>
+        <DCCReference Include="..\Sco.Provider.SQLite.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
