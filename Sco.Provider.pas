@@ -188,6 +188,9 @@ type
     function Commit: IProviderDatabase;
     function Rollback: IProviderDatabase;
     function CheckConnection: Boolean;
+    function IsConnected: Boolean;
+    procedure Connect;
+    procedure Close;
   end;
 
   TScoProvider = class

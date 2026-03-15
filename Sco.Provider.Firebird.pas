@@ -75,6 +75,9 @@ type
     function Commit: IProviderDatabase;
     function Rollback: IProviderDatabase;
     function CheckConnection: Boolean;
+    function IsConnected: Boolean;
+    procedure Connect;
+    procedure Close;
   end;
 
 implementation
@@ -105,6 +108,18 @@ begin
     FQuery.Close;
   end;
   FQuery.SQL.Clear;
+end;
+
+procedure TProviderFirebird.Close;
+begin
+  if FConnection.Connected then
+    FConnection.Close;
+end;
+
+procedure TProviderFirebird.Connect;
+begin
+  if not FConnection.Connected then
+    FConnection.Open;
 end;
 
 function TProviderFirebird.ConnectionString: string;
@@ -843,6 +858,11 @@ end;
 function TProviderFirebird.InTransaction: Boolean;
 begin
   Result := FConnection.InTransaction;
+end;
+
+function TProviderFirebird.IsConnected: Boolean;
+begin
+  Result := FConnection.Connected;
 end;
 
 function TProviderFirebird.Commit: IProviderDatabase;

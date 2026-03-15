@@ -74,6 +74,9 @@ type
     function Commit: IProviderDatabase;
     function Rollback: IProviderDatabase;
     function CheckConnection: Boolean;
+    function IsConnected: Boolean;
+    procedure Connect;
+    procedure Close;
   end;
 
 implementation
@@ -101,6 +104,18 @@ begin
   if FQuery.Active then
     FQuery.Close;
   FQuery.SQL.Clear;
+end;
+
+procedure TProviderSQLite.Close;
+begin
+  if FConnection.Connected then
+    FConnection.Close;
+end;
+
+procedure TProviderSQLite.Connect;
+begin
+  if not FConnection.Connected then
+    FConnection.Open;
 end;
 
 function TProviderSQLite.ConnectionString: string;
@@ -925,6 +940,11 @@ end;
 function TProviderSQLite.InTransaction: Boolean;
 begin
   Result := FConnection.InTransaction;
+end;
+
+function TProviderSQLite.IsConnected: Boolean;
+begin
+  Result := FConnection.Connected;
 end;
 
 function TProviderSQLite.Commit: IProviderDatabase;
