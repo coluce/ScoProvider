@@ -73,7 +73,7 @@ type
     function InTransaction: Boolean;
     function Commit: IProviderDatabase;
     function Rollback: IProviderDatabase;
-
+    function CheckConnection: Boolean;
   end;
 
 implementation
@@ -83,6 +83,16 @@ uses
   System.Generics.Collections, System.Generics.Defaults, FireDAC.Comp.DataSet;
 
 { TProviderSQLite }
+
+function TProviderSQLite.CheckConnection: Boolean;
+begin
+  try
+    FConnection.CheckOnline;
+    Result := True;
+  except
+    Result := False;
+  end;
+end;
 
 function TProviderSQLite.Clear: IProviderDatabase;
 begin

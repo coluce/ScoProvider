@@ -187,7 +187,7 @@ type
     function InTransaction: Boolean;
     function Commit: IProviderDatabase;
     function Rollback: IProviderDatabase;
-
+    function CheckConnection: Boolean;
   end;
 
   TScoProvider = class
